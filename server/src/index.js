@@ -9,12 +9,33 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
-// Resolve paths robustly regardless of where node is launched from
+// Resolve paths robustly across layouts:
+// Local (repo root /server/src -> need '..','..') and Docker build (WORKDIR /app with src directly under it -> need '..').
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename); // .../server/src
-const ROOT_DIR = path.resolve(__dirname, '..', '..'); // project root
-const ADMIN_DIR = path.join(ROOT_DIR, 'admin-dashboard');
-const DATA_DIR = path.resolve(__dirname, '..', 'data');
+const __dirname = path.dirname(__filename); // e.g. /app/src or <repo>/server/src
+
+function firstExisting(paths) {
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+// Candidate project roots
+const ROOT_DIR = firstExisting([
+  path.resolve(__dirname, '..', '..'), // repo root when running from server/src locally
+  path.resolve(__dirname, '..')        // container root when server contents copied directly
+]) || path.resolve(__dirname, '..');
+
+const ADMIN_DIR = firstExisting([
+  path.join(ROOT_DIR, 'admin-dashboard'),
+  path.resolve(__dirname, '..', 'admin-dashboard')
+]);
+
+const DATA_DIR = firstExisting([
+  path.resolve(__dirname, '..', 'data'),            // local layout
+  path.join(ROOT_DIR, 'data')                       // container root if data copied there
+]) || path.resolve(__dirname, '..', 'data');
 const DATA_FILE = path.join(DATA_DIR, 'data.json');
 fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(DATA_FILE)) {
