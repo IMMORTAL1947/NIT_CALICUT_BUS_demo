@@ -54,6 +54,43 @@
         }
       ],
       "buses": []
+    },
+    "NIT_CAL": {
+      "code": "NIT_CAL",
+      "name": "NIT_CALICUT",
+      "stops": [
+        {
+          "id": "s1",
+          "name": "NEW MEGA BOY HOSTEL",
+          "lat": 11.316357642330237,
+          "lng": 75.93733288976853
+        },
+        {
+          "id": "s2",
+          "name": "NEW MEGA BOYS",
+          "lat": 11.316219768064714,
+          "lng": 75.93725554682423
+        },
+        {
+          "id": "s3",
+          "name": "CENTER CIRCLE",
+          "lat": 11.321475859688716,
+          "lng": 75.93408658116067
+        }
+      ],
+      "routes": [
+        {
+          "id": "new-mega",
+          "name": "NEW MEGA",
+          "color": "#f44336",
+          "stopIds": [
+            "s1",
+            "s2",
+            "s3"
+          ]
+        }
+      ],
+      "buses": []
     }
   }
 }
