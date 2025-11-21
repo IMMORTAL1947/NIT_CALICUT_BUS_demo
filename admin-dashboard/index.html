@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campus Bus Admin Console</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Campus Bus Admin Console</h1>
+  </header>
+  <main>
+    <section class="controls">
+      <div>
+        <label>College Code</label>
+        <input id="collegeCode" placeholder="e.g. NITC" />
+      </div>
+      <div>
+        <label>College Name</label>
+        <input id="collegeName" placeholder="e.g. NIT Calicut" />
+      </div>
+      <button id="saveCollege">Create/Update College</button>
+      <span id="status"></span>
+    </section>
+
+    <section class="map-and-forms">
+      <div id="map"></div>
+      <div class="forms">
+        <h2>Stops</h2>
+        <p>Click on the map to add a stop. Edit names below.</p>
+        <ul id="stopsList"></ul>
+        <button id="saveStops">Save Stops</button>
+
+        <h2>Routes</h2>
+        <p>Create a route by ordering stop IDs (comma separated).</p>
+        <div>
+          <input id="routeName" placeholder="Route name" />
+          <input id="routeColor" type="color" value="#f44336" />
+          <input id="routeStopIds" placeholder="e.g. s1,s3,s2" />
+          <button id="addRoute">Add/Update Route</button>
+        </div>
+        <ul id="routesList"></ul>
+        <button id="saveRoutes">Save Routes</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

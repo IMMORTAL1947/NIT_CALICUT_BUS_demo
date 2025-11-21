@@ -1,0 +1,11 @@
+body { font-family: system-ui, Arial, sans-serif; margin: 0; }
+header { background:#111; color:#fff; padding:12px 20px; }
+main { padding: 12px; }
+.controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.controls input { padding:6px 8px; }
+#map { width: 60%; height: 70vh; float:left; }
+.forms { width: 38%; float:right; padding-left: 2%; }
+ul { list-style: none; padding: 0; }
+li { padding: 4px 0; }
+label { display:block; font-size: 12px; color:#555; }
+#status { margin-left: 12px; color: #2e7d32; }

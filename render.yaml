@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: nit-bus-platform
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production

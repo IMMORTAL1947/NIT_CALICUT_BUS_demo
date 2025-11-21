@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">NIT_CALCIUT_BUS_DEMO</string>
+    <string name="google_maps_key">AIzaSyB6lEBuJHA4PlyZzM315ublmll8OUSQo3I</string>
+    <string name="menu_bus_stops">Bus Stops</string>
+    <string name="menu_routes">Routes</string>
+    <string name="menu_route1">Route 1</string>
+    <string name="menu_route2">Route 2</string>
+    <string name="menu_route3">Route 3</string>
+
+</resources>

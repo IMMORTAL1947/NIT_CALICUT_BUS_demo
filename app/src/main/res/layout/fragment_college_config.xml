@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="College Settings"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="College Code" />
+
+    <EditText
+        android:id="@+id/inputCollegeCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="e.g. NITC"
+        android:inputType="text" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Server URL" />
+
+    <EditText
+        android:id="@+id/inputServerUrl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="http://10.0.2.2:3000"
+        android:inputType="textUri" />
+
+    <Button
+        android:id="@+id/btnSaveCollege"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_marginTop="12dp"/>
+
+    <Button
+        android:id="@+id/btnTestConnection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test Connection"
+        android:layout_marginTop="12dp"/>
+
+</LinearLayout>

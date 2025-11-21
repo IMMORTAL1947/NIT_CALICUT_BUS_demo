@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_bus_stops"
+        android:title="@string/menu_bus_stops"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/route1"
+        android:title="@string/menu_route1"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/route2"
+        android:title="@string/menu_route2"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/route3"
+        android:title="@string/menu_route3"
+        app:showAsAction="never" />
+
+</menu>
