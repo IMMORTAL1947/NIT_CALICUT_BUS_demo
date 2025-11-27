@@ -130,11 +130,27 @@ async function commitDbToGitHub(jsonText, gh) {
 
 async function fetchDbFromGitHub(gh) {
   const url = `https://api.github.com/repos/${gh.repo}/contents/${encodeURIComponent(gh.filePath)}?ref=${encodeURIComponent(gh.branch)}`;
-  const meta = await ghRequest('GET', url, undefined, gh.token);
-  if (!meta || !meta.content) throw new Error('No content in GitHub response');
-  const text = Buffer.from(meta.content, 'base64').toString('utf8');
-  fs.writeFileSync(DATA_FILE, text);
-  return true;
+  try {
+    const meta = await ghRequest('GET', url, undefined, gh.token);
+    if (!meta || !meta.content) throw new Error('No content in GitHub response');
+    const text = Buffer.from(meta.content, 'base64').toString('utf8');
+    fs.writeFileSync(DATA_FILE, text);
+    return true;
+  } catch (e) {
+    // If not found, optionally bootstrap an initial file in the data repo
+    if (/404/.test(String(e))) {
+      const shouldBootstrap = String(process.env.DATA_BOOTSTRAP_REPO || 'false').toLowerCase() === 'true';
+      if (shouldBootstrap) {
+        const initial = JSON.stringify({ colleges: {} }, null, 2);
+        await commitDbToGitHub(initial, gh);
+        fs.writeFileSync(DATA_FILE, initial);
+        return true;
+      }
+      // No bootstrap: leave local file as-is and return false
+      return false;
+    }
+    throw e;
+  }
 }
 
 // Create or update college meta
@@ -233,8 +249,12 @@ const PORT = process.env.PORT || 3000;
     const gh = getGithubConfig();
     const shouldSync = String(process.env.DATA_SYNC_ON_START || 'true').toLowerCase() === 'true';
     if (gh && shouldSync) {
-      await fetchDbFromGitHub(gh);
-      console.log('Data synced from GitHub on startup');
+      const ok = await fetchDbFromGitHub(gh);
+      if (ok) {
+        console.log('Data synced from GitHub on startup');
+      } else {
+        console.log('Data repo missing file; startup sync skipped');
+      }
     }
   } catch (e) {
     console.warn('Startup data sync failed:', e.message);
