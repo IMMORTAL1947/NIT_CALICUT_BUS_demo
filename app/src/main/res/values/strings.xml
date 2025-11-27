@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NIT_CALCIUT_BUS_DEMO</string>
+    <string name="app_name">Campus Transit</string>
     <string name="google_maps_key">AIzaSyB6lEBuJHA4PlyZzM315ublmll8OUSQo3I</string>
     <string name="menu_bus_stops">Bus Stops</string>
     <string name="menu_routes">Routes</string>

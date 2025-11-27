@@ -28,7 +28,9 @@ class RouteAdapter(private val routes: List<RouteInfo>) :
         private val stopsContainer: ViewGroup = itemView.findViewById(R.id.stopsContainer)
 
         fun bind(routeInfo: RouteInfo) {
-            routeNameText.text = routeInfo.routeName
+            routeNameText.text = if (!routeInfo.busName.isNullOrBlank())
+                "${routeInfo.routeName} • ${routeInfo.busName}"
+            else routeInfo.routeName
             routeColorIndicator.setBackgroundColor(routeInfo.routeColor)
             
             // Clear previous stops

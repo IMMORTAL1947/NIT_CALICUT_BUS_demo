@@ -36,7 +36,8 @@ class RoutesFragment : Fragment() {
 data class RouteInfo(
     val routeName: String,
     val routeColor: Int,
-    val stops: List<String>
+    val stops: List<String>,
+    val busName: String?
 )
 
 private fun RoutesFragment.loadRoutesFromBackend(onReady: (List<RouteInfo>) -> Unit) {
@@ -61,10 +62,19 @@ private fun RoutesFragment.loadRoutesFromBackend(onReady: (List<RouteInfo>) -> U
                 val json = org.json.JSONObject(response)
                 val stopsArr = json.getJSONArray("stops")
                 val routesArr = json.getJSONArray("routes")
+                val busesArr = json.optJSONArray("buses")
                 val stopNameById = mutableMapOf<String, String>()
                 for (i in 0 until stopsArr.length()) {
                     val s = stopsArr.getJSONObject(i)
                     stopNameById[s.getString("id")] = s.getString("name")
+                }
+                val busNameByRoute = mutableMapOf<String, String>()
+                if (busesArr != null) {
+                    for (i in 0 until busesArr.length()) {
+                        val b = busesArr.getJSONObject(i)
+                        val rId = b.optString("routeId", "")
+                        if (rId.isNotEmpty()) busNameByRoute[rId] = b.optString("name", "")
+                    }
                 }
                 val list = mutableListOf<RouteInfo>()
                 for (i in 0 until routesArr.length()) {
@@ -73,12 +83,16 @@ private fun RoutesFragment.loadRoutesFromBackend(onReady: (List<RouteInfo>) -> U
                     val colorHex = r.optString("color", "#2196f3")
                     val colorInt = android.graphics.Color.parseColor(colorHex)
                     val stopIds = r.getJSONArray("stopIds")
+                    val stopTimes = r.optJSONObject("stopTimes")
                     val stops = mutableListOf<String>()
                     for (j in 0 until stopIds.length()) {
                         val id = stopIds.getString(j)
-                        stops.add(stopNameById[id] ?: id)
+                        val label = stopNameById[id] ?: id
+                        val time = stopTimes?.optString(id)
+                        stops.add(if (!time.isNullOrEmpty()) "$label - $time" else label)
                     }
-                    list.add(RouteInfo(name, colorInt, stops))
+                    val busName = busNameByRoute[r.optString("id")]?.takeIf { it.isNotBlank() }
+                    list.add(RouteInfo(name, colorInt, stops, busName))
                 }
                 requireActivity().runOnUiThread {
                     if (list.isEmpty()) {

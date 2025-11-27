@@ -91,6 +91,79 @@
         }
       ],
       "buses": []
+    },
+    "IIT_D": {
+      "code": "IIT_D",
+      "name": "IIT DELHI",
+      "stops": [
+        {
+          "id": "s1",
+          "name": "IIT KHOSLA",
+          "lat": 28.545415197962804,
+          "lng": 77.19050983306418
+        },
+        {
+          "id": "s2",
+          "name": "IIT BLOCK 3",
+          "lat": 28.545358636528654,
+          "lng": 77.19081014798348
+        },
+        {
+          "id": "s3",
+          "name": "IIT PLAYGROUND",
+          "lat": 28.544774166596845,
+          "lng": 77.18969469256908
+        },
+        {
+          "id": "s4",
+          "name": "IDDC",
+          "lat": 28.544109563782115,
+          "lng": 77.1922902715141
+        },
+        {
+          "id": "s5",
+          "name": "IIT MAIN ROAD",
+          "lat": 28.54444422246122,
+          "lng": 77.19277292049148
+        },
+        {
+          "id": "s6",
+          "name": "HOSPITAL",
+          "lat": 28.545471759366627,
+          "lng": 77.18818775520636
+        }
+      ],
+      "routes": [
+        {
+          "id": "hospital",
+          "name": "HOSPITAL",
+          "color": "#f44336",
+          "stopIds": [
+            "s5",
+            "s4",
+            "s3",
+            "s7"
+          ],
+          "stopTimes": {
+            "s5": "08:23",
+            "s4": "09:21",
+            "s3": "05:42",
+            "s7": "11:04"
+          }
+        }
+      ],
+      "buses": [
+        {
+          "id": "iit-block",
+          "name": "IIT BLOCK",
+          "routeId": "hospital"
+        },
+        {
+          "id": "bus1",
+          "name": "BUS1",
+          "routeId": "HOSPITAL"
+        }
+      ]
     }
   }
 }

@@ -60,6 +60,15 @@ app.post('/api/colleges', (req, res) => {
   res.json(db.colleges[code]);
 });
 
+// List colleges (for search/autocomplete)
+app.get('/api/colleges', (req, res) => {
+  const db = readDb();
+  const list = Object.values(db.colleges).map(c => ({ code: c.code, name: c.name }));
+  const q = (req.query.q || '').toString().trim().toLowerCase();
+  const filtered = q ? list.filter(c => c.code.toLowerCase().includes(q) || (c.name || '').toLowerCase().includes(q)) : list;
+  res.json(filtered);
+});
+
 // Upsert stops
 app.post('/api/colleges/:code/stops', (req, res) => {
   const code = req.params.code;
@@ -73,14 +82,20 @@ app.post('/api/colleges/:code/stops', (req, res) => {
   res.json({ stops: college.stops });
 });
 
-// Upsert routes
+// Upsert routes (supports optional stopTimes per route)
 app.post('/api/colleges/:code/routes', (req, res) => {
   const code = req.params.code;
-  const { routes } = req.body; // [{id?, name, color, stopIds: []}]
+  const { routes } = req.body; // [{id?, name, color, stopIds: [], stopTimes?: { [stopId]: HH:mm }}]
   const db = readDb();
   const college = db.colleges[code];
   if (!college) return res.status(404).json({ error: 'college not found' });
-  const withIds = (routes || []).map(r => ({ id: r.id || nanoid(8), name: r.name, color: r.color || '#2196f3', stopIds: r.stopIds || [] }));
+  const withIds = (routes || []).map(r => ({
+    id: r.id || nanoid(8),
+    name: r.name,
+    color: r.color || '#2196f3',
+    stopIds: r.stopIds || [],
+    stopTimes: r.stopTimes || {}
+  }));
   college.routes = withIds;
   writeDb(db);
   res.json({ routes: college.routes });

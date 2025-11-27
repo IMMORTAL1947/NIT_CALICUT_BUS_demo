@@ -10,9 +10,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/bus"
+        android:icon="@drawable/bus2"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/bus"
+        android:roundIcon="@drawable/bus2"
         android:supportsRtl="true"
         android:theme="@style/Theme.NIT_CALCIUT_BUS_DEMO"
         android:usesCleartextTraffic="true">
