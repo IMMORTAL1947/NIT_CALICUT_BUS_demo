@@ -29,8 +29,9 @@ const ROOT_DIR = firstExisting([
 
 // Determine admin dashboard directory (may be absent in some Docker builds)
 const ADMIN_DIR = firstExisting([
-  path.join(ROOT_DIR, 'admin-dashboard'),
-  path.resolve(__dirname, '..', 'admin-dashboard')
+  path.join(ROOT_DIR, 'admin-dashboard'),                 // repo root placement
+  path.resolve(__dirname, '..', 'admin-dashboard'),       // /app/admin-dashboard
+  path.resolve(__dirname, 'admin-dashboard')              // server/admin-dashboard when build context = server
 ]) || null;
 
 const DATA_DIR = firstExisting([

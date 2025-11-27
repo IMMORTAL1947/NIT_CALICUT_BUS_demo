@@ -15,6 +15,9 @@ RUN npm ci --only=production || npm install --production
 COPY src ./src
 COPY data ./data
 
+# Include admin dashboard if present inside server context
+COPY admin-dashboard ./admin-dashboard
+
 ENV NODE_ENV=production
 EXPOSE 3000
 CMD ["npm", "run", "start"]
