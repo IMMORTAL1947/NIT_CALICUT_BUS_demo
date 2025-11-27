@@ -7,10 +7,21 @@ This repository contains:
 
 ## Deploy to Render (recommended, free tier)
 
-1. Push this repository to your GitHub account.
-2. Create a new Web Service on https://render.com and choose “Use render.yaml”.
-3. Render will detect `render.yaml` at the repo root and create the service.
-4. Deploy. The server listens on `PORT` provided by Render.
+There are two approaches:
+
+### A) Full UI + API (root Dockerfile)
+1. Ensure the root `Dockerfile` exists (bundles server + admin-dashboard).
+2. On Render: create a new Web Service, set Root Directory to repository root (blank).
+3. Environment: Docker; no build/start commands (Dockerfile handles it).
+4. Deploy. Visit `/` for the admin dashboard, `/api/...` for endpoints.
+
+### B) API only (server folder Dockerfile)
+1. Set Root Directory to `server`.
+2. Use `server/Dockerfile` (no dashboard included) for a slimmer image.
+3. Root URL returns JSON hint; dashboard not served.
+
+### C) Node runtime (render.yaml)
+Use the provided `render.yaml` to let Render manage Node without Docker (add back if removed). Good for quick iterations.
 
 Notes
 - The admin dashboard is served at the root path `/` of your Render URL.
@@ -33,3 +44,8 @@ npm run dev
 - Server URL: your Render URL (e.g., `https://your-app.onrender.com`), or `http://10.0.2.2:3000` for local.
 
 More deployment options: see `server/README_DEPLOY.md`.
+
+## Switching Deployment Mode
+- Want the dashboard back? Use the root Dockerfile (Approach A) or Node runtime.
+- Want to reduce image size? Use server-only Dockerfile (Approach B).
+- Need persistent data? Attach a disk or migrate to a database.
