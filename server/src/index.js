@@ -3,6 +3,7 @@ import cors from 'cors';
 import { nanoid } from 'nanoid';
 import fs from 'fs';
 import path from 'path';
+import https from 'https';
 import { fileURLToPath } from 'url';
 
 const app = express();
@@ -34,10 +35,10 @@ const ADMIN_DIR = firstExisting([
   path.resolve(__dirname, 'admin-dashboard')              // server/admin-dashboard when build context = server
 ]) || null;
 
-const DATA_DIR = firstExisting([
+const DATA_DIR = process.env.DATA_DIR || (firstExisting([
   path.resolve(__dirname, '..', 'data'),            // local layout
   path.join(ROOT_DIR, 'data')                       // container root if data copied there
-]) || path.resolve(__dirname, '..', 'data');
+]) || path.resolve(__dirname, '..', 'data'));
 const DATA_FILE = path.join(DATA_DIR, 'data.json');
 fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(DATA_FILE)) {
@@ -47,8 +48,93 @@ if (!fs.existsSync(DATA_FILE)) {
 function readDb() {
   return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 }
-function writeDb(db) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2));
+async function writeDb(db) {
+  const jsonText = JSON.stringify(db, null, 2);
+  fs.writeFileSync(DATA_FILE, jsonText);
+  // Fire-and-forget GitHub sync if configured
+  try {
+    const gh = getGithubConfig();
+    if (gh && gh.token && gh.repo) {
+      commitDbToGitHub(jsonText, gh).catch((e) => console.warn('GitHub sync failed:', e.message));
+    }
+  } catch (e) {
+    console.warn('GitHub sync error:', e);
+  }
+}
+
+function ghRequest(method, url, bodyObj, token) {
+  return new Promise((resolve, reject) => {
+    const opts = new URL(url);
+    const req = https.request({
+      method,
+      hostname: opts.hostname,
+      path: opts.pathname + (opts.search || ''),
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'User-Agent': 'campus-transit-server',
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', (d) => data += d);
+      res.on('end', () => {
+        const status = res.statusCode || 0;
+        if (status >= 200 && status < 300) {
+          try { resolve(JSON.parse(data || '{}')); } catch { resolve({}); }
+        } else {
+          reject(new Error(`GitHub ${method} ${url} failed: ${status} ${data}`));
+        }
+      });
+    });
+    req.on('error', reject);
+    if (bodyObj) req.write(JSON.stringify(bodyObj));
+    req.end();
+  });
+}
+
+function getGithubConfig() {
+  const token = process.env.DATA_GITHUB_TOKEN || process.env.GITHUB_TOKEN;
+  const repo = process.env.DATA_GITHUB_REPO || process.env.GITHUB_REPO; // owner/name
+  const branch = process.env.DATA_GITHUB_BRANCH || process.env.GITHUB_BRANCH || 'main';
+  const filePath = process.env.DATA_GITHUB_FILE_PATH || process.env.GITHUB_FILE_PATH || 'data.json';
+  if (!repo || !token) return null;
+  return { token, repo, branch, filePath };
+}
+
+async function commitDbToGitHub(jsonText, gh) {
+  const base = `https://api.github.com/repos/${gh.repo}/contents/${encodeURIComponent(gh.filePath)}`;
+  const getUrl = `${base}?ref=${encodeURIComponent(gh.branch)}`;
+  let sha = undefined;
+  try {
+    const meta = await ghRequest('GET', getUrl, undefined, gh.token);
+    sha = meta && meta.sha;
+  } catch (e) {
+    if (!/404/.test(String(e))) {
+      throw e;
+    }
+  }
+  const contentB64 = Buffer.from(jsonText, 'utf8').toString('base64');
+  const body = {
+    message: `chore(data): update data.json via admin dashboard`,
+    content: contentB64,
+    branch: gh.branch,
+    sha,
+    committer: {
+      name: process.env.GITHUB_COMMIT_NAME || 'Campus Transit Bot',
+      email: process.env.GITHUB_COMMIT_EMAIL || 'bot@example.com'
+    }
+  };
+  await ghRequest('PUT', base, body, gh.token);
+}
+
+async function fetchDbFromGitHub(gh) {
+  const url = `https://api.github.com/repos/${gh.repo}/contents/${encodeURIComponent(gh.filePath)}?ref=${encodeURIComponent(gh.branch)}`;
+  const meta = await ghRequest('GET', url, undefined, gh.token);
+  if (!meta || !meta.content) throw new Error('No content in GitHub response');
+  const text = Buffer.from(meta.content, 'base64').toString('utf8');
+  fs.writeFileSync(DATA_FILE, text);
+  return true;
 }
 
 // Create or update college meta
@@ -141,4 +227,34 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+// Optionally sync data.json from GitHub data repo on startup
+(async () => {
+  try {
+    const gh = getGithubConfig();
+    const shouldSync = String(process.env.DATA_SYNC_ON_START || 'true').toLowerCase() === 'true';
+    if (gh && shouldSync) {
+      await fetchDbFromGitHub(gh);
+      console.log('Data synced from GitHub on startup');
+    }
+  } catch (e) {
+    console.warn('Startup data sync failed:', e.message);
+  } finally {
+    app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+  }
+})();
+
+// Optional admin endpoint to trigger sync from GitHub 
+app.post('/api/admin/sync-from-github', async (req, res) => {
+  const token = process.env.ADMIN_TOKEN;
+  if (token && req.headers['x-admin-token'] !== token) {
+    return res.status(401).json({ error: 'unauthorized' });
+  }
+  const gh = getGithubConfig();
+  if (!gh) return res.status(400).json({ error: 'GitHub data repo not configured' });
+  try {
+    await fetchDbFromGitHub(gh);
+    return res.json({ ok: true });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+});
