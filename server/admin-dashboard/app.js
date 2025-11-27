@@ -118,6 +118,27 @@ $('addRoute').onclick = () => {
   renderRoutesList();
 };
 
+// Save stops to backend
+$('saveStops').onclick = async () => {
+  const code = $('collegeCode').value.trim();
+  if (!code) { $('status').textContent = 'Enter college code and click Save College first'; return; }
+  try {
+    const res = await fetch(`${API_BASE}/colleges/${code}/stops`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stops })
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Save stops failed (${res.status}): ${text}`);
+    }
+    const json = await res.json();
+    $('status').textContent = `Saved ${json.stops.length} stops.`;
+  } catch (e) {
+    $('status').textContent = e.message;
+  }
+};
+
 function renderRoutesList() {
   const ul = $('routesList');
   ul.innerHTML = '';
@@ -135,10 +156,18 @@ function renderRoutesList() {
 
 $('saveRoutes').onclick = async () => {
   const code = $('collegeCode').value.trim();
-  if (!code) return alert('Enter college code first');
-  const res = await fetch(`${API_BASE}/colleges/${code}/routes`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ routes }) });
-  const json = await res.json();
-  $('status').textContent = `Saved ${json.routes.length} routes.`;
+  if (!code) return alert('Enter college code first (save college meta first)');
+  try {
+    const res = await fetch(`${API_BASE}/colleges/${code}/routes`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ routes }) });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Save routes failed (${res.status}): ${text}`);
+    }
+    const json = await res.json();
+    $('status').textContent = `Saved ${json.routes.length} routes.`;
+  } catch (e) {
+    $('status').textContent = e.message;
+  }
 };
 
 function collectTimes(stopIds) {
