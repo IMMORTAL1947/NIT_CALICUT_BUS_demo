@@ -1,4 +1,7 @@
-const API_BASE = ((new URLSearchParams(location.search).get('api')) || 'http://localhost:3000').replace(/\/$/, '') + '/api';
+// Prefer same-origin API when admin UI is served by the backend; allow override via ?api= URL param
+const apiParam = new URLSearchParams(location.search).get('api');
+const base = (apiParam && apiParam.trim().length) ? apiParam.trim() : window.location.origin;
+const API_BASE = base.replace(/\/$/, '') + '/api';
 
 const map = L.map('map').setView([11.3215, 75.9342], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
