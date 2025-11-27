@@ -27,10 +27,11 @@ const ROOT_DIR = firstExisting([
   path.resolve(__dirname, '..')        // container root when server contents copied directly
 ]) || path.resolve(__dirname, '..');
 
+// Determine admin dashboard directory (may be absent in some Docker builds)
 const ADMIN_DIR = firstExisting([
   path.join(ROOT_DIR, 'admin-dashboard'),
   path.resolve(__dirname, '..', 'admin-dashboard')
-]);
+]) || null;
 
 const DATA_DIR = firstExisting([
   path.resolve(__dirname, '..', 'data'),            // local layout
@@ -122,18 +123,20 @@ app.get('/api/colleges/:code/config', (req, res) => {
   res.json(college);
 });
 
-// Serve Admin Dashboard statically at root
-if (fs.existsSync(ADMIN_DIR)) {
+// Serve Admin Dashboard statically at root if available
+if (ADMIN_DIR && fs.existsSync(ADMIN_DIR)) {
   app.use(express.static(ADMIN_DIR));
 }
 
 // Root helper
 app.get('/', (req, res) => {
-  const idx = path.join(ADMIN_DIR, 'index.html');
-  if (fs.existsSync(idx)) return res.sendFile(idx);
-  return res
-    .status(200)
-    .send('Admin Dashboard not found. Ensure admin-dashboard/ exists at project root.');
+  if (ADMIN_DIR && fs.existsSync(path.join(ADMIN_DIR, 'index.html'))) {
+    return res.sendFile(path.join(ADMIN_DIR, 'index.html'));
+  }
+  return res.status(200).json({
+    message: 'Admin dashboard not bundled in this deployment.',
+    hint: 'Include admin-dashboard/ in build context or switch Render root directory to repo root if you want the UI.'
+  });
 });
 
 const PORT = process.env.PORT || 3000;
