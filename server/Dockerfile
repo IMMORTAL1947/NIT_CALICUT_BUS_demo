@@ -2,23 +2,19 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# When building on Render with Docker, the build context is the repo root.
-# Our server lives under ./server, while the static dashboard is ./admin-dashboard.
+# This Dockerfile now assumes the BUILD CONTEXT is the server directory itself
+# (Render "Root Directory" set to server). If you want the admin dashboard,
+# set Root Directory to repo root AND revert to copying admin-dashboard.
 
-# Copy server package files explicitly (avoid wildcard failing if lockfile is absent)
-COPY server/package.json ./package.json
-COPY server/package-lock.json ./package-lock.json
+# Copy package manifests
+COPY package.json package-lock.json* ./
 
 RUN npm ci --only=production || npm install --production
 
-# Copy server source and assets
-COPY server/src ./src
-COPY server/data ./data
-
-# Copy admin dashboard to be served at /
-COPY admin-dashboard ./admin-dashboard
+# Copy source and data from current context
+COPY src ./src
+COPY data ./data
 
 ENV NODE_ENV=production
-
 EXPOSE 3000
 CMD ["npm", "run", "start"]
