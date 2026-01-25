@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bus Driver Publisher</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 16px; }
+    .row { margin-bottom: 10px; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; }
+    input { width: 100%; padding: 8px; }
+    button { padding: 10px 14px; margin-right: 8px; }
+    #status { margin-top: 12px; font-size: 0.95rem; }
+    .ok { color: #0a7; }
+    .err { color: #c00; }
+  </style>
+</head>
+<body>
+  <h2>Bus Driver Location Publisher</h2>
+  <p>Use this page on a driver's phone to publish GPS location to the backend using a driver token.</p>
+  <div class="row">
+    <label for="api">Server API Base (e.g., https://your-render.onrender.com)</label>
+    <input id="api" type="text" placeholder="https://your-server" />
+  </div>
+  <div class="row">
+    <label for="code">College Code</label>
+    <input id="code" type="text" placeholder="nitc" />
+  </div>
+  <div class="row">
+    <label for="busId">Bus ID</label>
+    <input id="busId" type="text" placeholder="bus-1" />
+  </div>
+  <div class="row">
+    <label for="token">Driver Token</label>
+    <input id="token" type="text" placeholder="paste token here" />
+  </div>
+  <div class="row">
+    <label for="interval">Update Interval (ms)</label>
+    <input id="interval" type="number" value="5000" />
+  </div>
+  <div class="row">
+    <button id="start">Start Publishing</button>
+    <button id="stop" disabled>Stop</button>
+  </div>
+  <div id="status"></div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // Prefill from query params if present
+    const params = new URLSearchParams(location.search);
+    if (params.get('api')) $('api').value = params.get('api');
+    if (params.get('code')) $('code').value = params.get('code');
+    if (params.get('busId')) $('busId').value = params.get('busId');
+    if (params.get('token')) $('token').value = params.get('token');
+
+    let watchId = null;
+    let timerId = null;
+    let lastPos = null;
+
+    function log(msg, ok=false) {
+      const el = $('status');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML = `<span class="${ok ? 'ok' : 'err'}">[${time}] ${msg}</span>`;
+    }
+
+    async function publish(lat, lng) {
+      const api = $('api').value.trim();
+      const code = $('code').value.trim();
+      const busId = $('busId').value.trim();
+      const token = $('token').value.trim();
+      if (!api || !code || !busId || !token) {
+        log('Please fill all fields.', false);
+        return;
+      }
+      try {
+        const res = await fetch(`${api}/api/colleges/${encodeURIComponent(code)}/live/buses/${encodeURIComponent(busId)}/loc`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Driver-Token': token },
+          body: JSON.stringify({ lat, lng })
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`${res.status} ${text}`);
+        }
+        log(`Published: ${lat.toFixed(6)}, ${lng.toFixed(6)}`, true);
+      } catch (e) {
+        log('Publish error: ' + e.message, false);
+      }
+    }
+
+    function start() {
+      const interval = parseInt($('interval').value, 10) || 5000;
+      if (!('geolocation' in navigator)) {
+        log('Geolocation not supported on this device.', false);
+        return;
+      }
+      $('start').disabled = true;
+      $('stop').disabled = false;
+      log('Starting…', true);
+      // Get frequent updates; we will throttle by interval
+      watchId = navigator.geolocation.watchPosition(pos => {
+        lastPos = pos;
+      }, err => {
+        log('GPS error: ' + err.message, false);
+      }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
+
+      timerId = setInterval(() => {
+        if (lastPos) {
+          const { latitude, longitude } = lastPos.coords;
+          publish(latitude, longitude);
+        }
+      }, interval);
+    }
+
+    function stop() {
+      $('start').disabled = false;
+      $('stop').disabled = true;
+      if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+      if (timerId !== null) clearInterval(timerId);
+      watchId = null; timerId = null; lastPos = null;
+      log('Stopped.', true);
+    }
+
+    $('start').addEventListener('click', start);
+    $('stop').addEventListener('click', stop);
+  </script>
+</body>
+</html>

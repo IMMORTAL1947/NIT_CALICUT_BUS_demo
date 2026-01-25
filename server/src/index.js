@@ -55,7 +55,7 @@ async function writeDb(db) {
   try {
     const gh = getGithubConfig();
     if (gh && gh.token && gh.repo) {
-      commitDbToGitHub(jsonText, gh).catch((e) => console.warn('GitHub sync failed:', e.message));
+      attemptGithubSync(jsonText, gh);
     }
   } catch (e) {
     console.warn('GitHub sync error:', e);
@@ -100,6 +100,24 @@ function getGithubConfig() {
   const filePath = process.env.DATA_GITHUB_FILE_PATH || process.env.GITHUB_FILE_PATH || 'data.json';
   if (!repo || !token) return null;
   return { token, repo, branch, filePath };
+}
+
+// Simple in-memory failure backoff to avoid log spam when token lacks permission
+let githubSyncDisabled = false;
+let githubSyncFailureCount = 0;
+const GITHUB_SYNC_MAX_FAILURES = Number(process.env.GITHUB_SYNC_MAX_FAILURES || 6);
+
+function attemptGithubSync(jsonText, gh) {
+  if (githubSyncDisabled) return;
+  commitDbToGitHub(jsonText, gh).catch((e) => {
+    githubSyncFailureCount += 1;
+    console.warn('GitHub sync failed:', e.message);
+    // Disable further attempts if persistent failure (e.g., 403 permission)
+    if (githubSyncFailureCount >= GITHUB_SYNC_MAX_FAILURES) {
+      githubSyncDisabled = true;
+      console.warn(`GitHub sync disabled after ${githubSyncFailureCount} consecutive failures. Set GITHUB_SYNC_MAX_FAILURES or fix token permissions to re-enable (restart).`);
+    }
+  });
 }
 
 async function commitDbToGitHub(jsonText, gh) {
@@ -208,11 +226,16 @@ app.post('/api/colleges/:code/routes', (req, res) => {
 // Upsert buses
 app.post('/api/colleges/:code/buses', (req, res) => {
   const code = req.params.code;
-  const { buses } = req.body; // [{id?, name, routeId}]
+  const { buses } = req.body; // [{id?, name, routeId, driverToken?}]
   const db = readDb();
   const college = db.colleges[code];
   if (!college) return res.status(404).json({ error: 'college not found' });
-  const withIds = (buses || []).map(b => ({ id: b.id || nanoid(8), name: b.name, routeId: b.routeId }));
+  const existing = college.buses || [];
+  const withIds = (buses || []).map(b => {
+    const id = b.id || nanoid(8);
+    const prev = existing.find(x => x.id === id) || {};
+    return { id, name: b.name, routeId: b.routeId, driverToken: b.driverToken || prev.driverToken };
+  });
   college.buses = withIds;
   writeDb(db);
   res.json({ buses: college.buses });
@@ -240,6 +263,55 @@ app.get('/', (req, res) => {
     message: 'Admin dashboard not bundled in this deployment.',
     hint: 'Include admin-dashboard/ in build context or switch Render root directory to repo root if you want the UI.'
   });
+});
+
+// ===== Live tracking state =====
+const liveState = {}; // { [collegeCode]: { [busId]: { lat, lng, speed, heading, ts } } }
+
+function setLiveLocation(code, busId, payload) {
+  liveState[code] = liveState[code] || {};
+  liveState[code][busId] = payload;
+}
+
+// Generate or rotate driver token for a bus
+app.post('/api/colleges/:code/buses/:busId/driver-token', (req, res) => {
+  const code = req.params.code; const busId = req.params.busId;
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  const idx = (college.buses || []).findIndex(b => b.id === busId);
+  if (idx < 0) return res.status(404).json({ error: 'bus not found' });
+  const token = nanoid(24);
+  college.buses[idx].driverToken = token;
+  writeDb(db);
+  const apiBase = `${req.protocol}://${req.get('host')}`;
+  const deepLink = `campus-transit://driver?code=${encodeURIComponent(code)}&busId=${encodeURIComponent(busId)}&token=${encodeURIComponent(token)}&api=${encodeURIComponent(apiBase)}`;
+  res.json({ busId, driverToken: token, deepLink });
+});
+
+// Driver publishes location
+app.post('/api/colleges/:code/live/buses/:busId/loc', (req, res) => {
+  const code = req.params.code; const busId = req.params.busId;
+  const { lat, lng, speed, heading, ts } = req.body || {};
+  if (typeof lat !== 'number' || typeof lng !== 'number') return res.status(400).json({ error: 'lat,lng required' });
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  const bus = (college.buses || []).find(b => b.id === busId);
+  if (!bus) return res.status(404).json({ error: 'bus not found' });
+  const token = req.headers['x-driver-token'] || req.headers['X-Driver-Token'] || req.headers['x-driver-token'];
+  if (!bus.driverToken || !token || token !== bus.driverToken) return res.status(401).json({ error: 'unauthorized' });
+  const payload = { lat, lng, speed: speed || null, heading: heading || null, ts: ts || Date.now() };
+  setLiveLocation(code, busId, payload);
+  res.json({ ok: true });
+});
+
+// Riders fetch live bus locations (polling)
+app.get('/api/colleges/:code/live', (req, res) => {
+  const code = req.params.code;
+  const state = liveState[code] || {};
+  const buses = Object.entries(state).map(([busId, loc]) => ({ busId, ...loc }));
+  res.json({ buses });
 });
 
 const PORT = process.env.PORT || 3000;

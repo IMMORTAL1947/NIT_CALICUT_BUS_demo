@@ -53,7 +53,14 @@
           ]
         }
       ],
-      "buses": []
+      "buses": [
+        {
+          "id": "bus1",
+          "name": "BUS1",
+          "routeId": "SOMS",
+          "driverToken": "70oxMJNCPBRvcVtGl-4QFS6Z"
+        }
+      ]
     },
     "NIT_CAL": {
       "code": "NIT_CAL",

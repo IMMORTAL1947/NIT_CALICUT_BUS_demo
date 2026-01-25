@@ -199,8 +199,49 @@ function renderBusesList() {
   ul.innerHTML = '';
   buses.forEach(b => {
     const li = document.createElement('li');
-    li.textContent = `${b.name} (${b.id}) -> ${b.routeId}`;
+    const tokenHtml = b.driverToken ? ` &nbsp; <small>token: ${b.driverToken}</small>` : '';
+    const copyBtn = ` &nbsp; <button data-busid="${b.id}" class="copyLink">Copy Driver Link</button>`;
+    const openLink = b.driverToken
+      ? ` &nbsp; <a target="_blank" href="/driver.html?api=${encodeURIComponent(window.location.origin)}&code=${encodeURIComponent($('collegeCode').value.trim())}&busId=${encodeURIComponent(b.id)}&token=${encodeURIComponent(b.driverToken)}">Open Driver Page</a>`
+      : '';
+    li.innerHTML = `${b.name} (<b>${b.id}</b>) → ${b.routeId || ''}${tokenHtml}` +
+      ` &nbsp; <button data-busid="${b.id}" class="genToken">Generate Token</button>` +
+      copyBtn +
+      openLink;
     ul.appendChild(li);
+  });
+  ul.querySelectorAll('.genToken').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const code = $('collegeCode').value.trim();
+      const busId = e.target.getAttribute('data-busid');
+      if (!code || !busId) return alert('Select college and bus first');
+      try {
+        const res = await fetch(`${API_BASE}/colleges/${code}/buses/${busId}/driver-token`, { method:'POST' });
+        const json = await res.json();
+        const idx = buses.findIndex(b => b.id === busId);
+        if (idx >= 0) buses[idx].driverToken = json.driverToken;
+        // Try to auto-copy deep link for convenience
+        try { await navigator.clipboard.writeText(json.deepLink || ''); $('status').textContent = 'Driver token generated; link copied'; }
+        catch { $('status').textContent = 'Driver token generated'; }
+        // Re-render locally to keep buttons visible without wiping unsaved state
+        renderBusesList();
+      } catch (err) {
+        $('status').textContent = 'Token generate failed';
+      }
+    });
+  });
+  ul.querySelectorAll('.copyLink').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const code = $('collegeCode').value.trim();
+      const busId = e.target.getAttribute('data-busid');
+      const b = buses.find(x => x.id === busId);
+      if (!code) { alert('Enter college code first'); return; }
+      if (!b) { alert('Select a bus first'); return; }
+      if (!b.driverToken) { alert('Generate token first'); return; }
+      const deepLink = `campus-transit://driver?code=${encodeURIComponent(code)}&busId=${encodeURIComponent(busId)}&token=${encodeURIComponent(b.driverToken)}&api=${encodeURIComponent(window.location.origin)}`;
+      try { await navigator.clipboard.writeText(deepLink); $('status').textContent = 'Driver link copied'; }
+      catch { $('status').textContent = deepLink; }
+    });
   });
 }
 

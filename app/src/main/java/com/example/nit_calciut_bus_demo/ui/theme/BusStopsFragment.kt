@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.*
 class BusStopsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
+    private val liveMarkers: MutableMap<String, Marker> = mutableMapOf()
+    private var livePollingThread: Thread? = null
 
     companion object {}
 
@@ -54,6 +56,7 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
 
     // Try to load from backend using college code; if it fails, show an error toast
     loadAndRenderStops()
+    startLivePolling()
 
         // Camera will be centered to fetched stops when available
     }
@@ -127,6 +130,62 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }.start()
+    }
+
+    private fun startLivePolling() {
+        val code = AppPrefs.getCollegeCode(requireContext()) ?: return
+        val baseUrl = AppPrefs.getServerUrl(requireContext()) ?: return
+        livePollingThread?.interrupt()
+        livePollingThread = Thread {
+            try {
+                while (!Thread.currentThread().isInterrupted) {
+                    val url = java.net.URL("${baseUrl}/api/colleges/${code}/live")
+                    val conn = url.openConnection() as java.net.HttpURLConnection
+                    conn.requestMethod = "GET"
+                    conn.connectTimeout = 5000
+                    conn.readTimeout = 5000
+                    if (conn.responseCode == 200) {
+                        val response = conn.inputStream.bufferedReader().use { it.readText() }
+                        val json = org.json.JSONObject(response)
+                        val arr = json.getJSONArray("buses")
+                        val positions = mutableListOf<Triple<String, Double, Double>>()
+                        for (i in 0 until arr.length()) {
+                            val o = arr.getJSONObject(i)
+                            positions.add(Triple(o.getString("busId"), o.getDouble("lat"), o.getDouble("lng")))
+                        }
+                        requireActivity().runOnUiThread {
+                            updateLiveMarkers(positions)
+                        }
+                    }
+                    conn.disconnect()
+                    Thread.sleep(5000)
+                }
+            } catch (_: InterruptedException) {
+            } catch (e: Exception) {
+                Log.e("LivePolling", "error", e)
+            }
+        }
+        livePollingThread!!.start()
+    }
+
+    private fun updateLiveMarkers(positions: List<Triple<String, Double, Double>>) {
+        val icon = getScaledBusIcon(32)
+        for ((busId, lat, lng) in positions) {
+            val pos = LatLng(lat, lng)
+            val existing = liveMarkers[busId]
+            if (existing != null) {
+                existing.position = pos
+            } else {
+                val marker = mMap.addMarker(MarkerOptions().position(pos).icon(icon).title("Bus: $busId"))
+                if (marker != null) liveMarkers[busId] = marker
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        livePollingThread?.interrupt()
+        livePollingThread = null
     }
 
     private fun getScaledBusIcon(dpSize: Int = 28): BitmapDescriptor {
