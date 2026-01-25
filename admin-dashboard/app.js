@@ -46,14 +46,40 @@ map.on('click', (e) => {
   renderStopsList();
 });
 
-$('saveCollege').onclick = async () => {
-  const code = $('collegeCode').value.trim();
-  const name = $('collegeName').value.trim();
-  if (!code) return alert('Enter college code');
-  const res = await fetch(`${API_BASE}/colleges`, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ code, name }) });
-  const json = await res.json();
-  $('status').textContent = `Saved college ${json.code}`;
-};
+// Create College (from create section)
+const btnCreate = $('btnCreateCollege');
+if (btnCreate) {
+  btnCreate.onclick = async () => {
+    const code = $('collegeCode').value.trim();
+    const name = $('collegeName').value.trim();
+    if (!code) return alert('Enter college code');
+    const res = await fetch(`${API_BASE}/colleges`, { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ code, name }) });
+    const json = await res.json();
+    $('status').textContent = `Saved college ${json.code}`;
+    await loadCollege(json.code);
+  };
+}
+
+
+// Toggle create vs update flow
+const hintLink = document.querySelector('.hint-link');
+if (hintLink) {
+  hintLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    const createSec = $('createCollege');
+    if (createSec) createSec.style.display = 'block';
+    const typed = $('searchCollege').value.trim();
+    if (typed) $('collegeCode').value = typed;
+  });
+}
+
+const searchInp = $('searchCollege');
+if (searchInp) {
+  searchInp.addEventListener('input', (e) => {
+    const createSec = $('createCollege');
+    if (createSec) createSec.style.display = 'none';
+  });
+}
 
 // Search colleges
 $('btnSearch').onclick = async () => {
@@ -161,19 +187,22 @@ function collectTimes(stopIds) {
   return out;
 }
 
-$('genTimes').onclick = () => {
-  const ids = $('routeStopIds').value.split(',').map(s => s.trim()).filter(Boolean);
+$('genStopTimes').onclick = () => {
+  let ids = $('routeStopIds').value.split(',').map(s => s.trim()).filter(Boolean);
+  if (ids.length === 0 && routes.length > 0) {
+    ids = (routes[routes.length - 1].stopIds || []).slice();
+  }
   const container = $('routeTimes');
   container.innerHTML = '';
-  if (ids.length === 0) { container.textContent = 'Enter stop IDs first'; return; }
-  const table = document.createElement('div');
+  if (ids.length === 0) { container.textContent = 'Enter stop IDs above or add a route first'; return; }
+  const list = document.createElement('div');
   ids.forEach(id => {
     const row = document.createElement('div');
-    row.style.margin = '4px 0';
-    row.innerHTML = `<label style="display:inline-block;width:80px;">${id}</label> <input type="time" data-stop="${id}" />`;
-    table.appendChild(row);
+    row.style.margin = '6px 0';
+    row.innerHTML = `<label style="display:inline-block;width:140px;">${id}</label> <input type="time" data-stop="${id}" placeholder="ETA" />`;
+    list.appendChild(row);
   });
-  container.appendChild(table);
+  container.appendChild(list);
 };
 
 // Buses
@@ -183,13 +212,14 @@ function renderBusesList() {
   ul.innerHTML = '';
   buses.forEach(b => {
     const li = document.createElement('li');
-    const tokenHtml = b.driverToken ? ` &nbsp; <small>token: ${b.driverToken}</small>` : '';
+    const last4 = b.driverToken ? b.driverToken.slice(-4) : '';
+    const tokenHtml = b.driverToken ? ` &nbsp; <small class="token" title="last 4: ${last4}">Driver Token: •••••••• (active)</small>` : '';
     const copyBtn = ` &nbsp; <button data-busid="${b.id}" class="copyLink">Copy Driver Link</button>`;
     const openLink = b.driverToken
-      ? ` &nbsp; <a target="_blank" href="/driver.html?api=${encodeURIComponent(window.location.origin)}&code=${encodeURIComponent($('collegeCode').value.trim())}&busId=${encodeURIComponent(b.id)}&token=${encodeURIComponent(b.driverToken)}">Open Driver Page</a>`
+      ? ` &nbsp; <a target="_blank" href="/driver.html?api=${encodeURIComponent(window.location.origin)}&code=${encodeURIComponent($('collegeCode').value.trim())}&busId=${encodeURIComponent(b.id)}&token=${encodeURIComponent(b.driverToken)}">Open Driver Tracking Page</a>`
       : '';
     li.innerHTML = `${b.name} (<b>${b.id}</b>) → ${b.routeId || ''}${tokenHtml}` +
-      ` &nbsp; <button data-busid="${b.id}" class="genToken">Generate Token</button>` +
+      ` &nbsp; <button data-busid="${b.id}" class="genToken">Generate Driver Token</button>` +
       copyBtn +
       openLink;
     ul.appendChild(li);
@@ -221,7 +251,7 @@ function renderBusesList() {
       if (!b) { alert('Select a bus first'); return; }
       if (!b.driverToken) { alert('Generate token first'); return; }
       const deepLink = `campus-transit://driver?code=${encodeURIComponent(code)}&busId=${encodeURIComponent(busId)}&token=${encodeURIComponent(b.driverToken)}&api=${encodeURIComponent(window.location.origin)}`;
-      try { await navigator.clipboard.writeText(deepLink); $('status').textContent = 'Driver link copied'; }
+      try { await navigator.clipboard.writeText(deepLink); $('status').textContent = 'Driver tracking link copied'; }
       catch { $('status').textContent = deepLink; }
     });
   });
@@ -243,7 +273,7 @@ $('saveBuses').onclick = async () => {
   if (!code) return alert('Enter college code first');
   const res = await fetch(`${API_BASE}/colleges/${code}/buses`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ buses }) });
   const json = await res.json();
-  $('status').textContent = `Saved ${json.buses.length} buses.`;
+  $('status').textContent = `Saved bus settings for ${json.buses.length} bus(es).`;
 };
 
 // Map place search via Nominatim

@@ -39,18 +39,20 @@
             "s2",
             "s3",
             "s4"
-          ]
+          ],
+          "stopTimes": {}
         },
         {
           "id": "soms",
           "name": "soms",
-          "color": "#34e7f4",
+          "color": "#f44336",
           "stopIds": [
             "s2",
             "s1",
             "s4",
-            "s3"
-          ]
+            "s2"
+          ],
+          "stopTimes": {}
         }
       ],
       "buses": [
@@ -171,6 +173,13 @@
           "routeId": "HOSPITAL"
         }
       ]
+    },
+    "IITB": {
+      "code": "IITB",
+      "name": "IIT BOMBAY",
+      "stops": [],
+      "routes": [],
+      "buses": []
     }
   }
 }

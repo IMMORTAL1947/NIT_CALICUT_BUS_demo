@@ -1,5 +1,9 @@
 body { font-family: system-ui, Arial, sans-serif; margin: 0; }
 header { background:#111; color:#fff; padding:12px 20px; }
+header .brand { display:flex; align-items:center; gap:10px; }
+header .brand img { height:28px; width:auto; filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+header .brand h1 { margin:0; letter-spacing:1px; font-weight:700; }
+header .subheading { margin:4px 0 0 38px; color:#bbb; font-size:0.95rem; }
 main { padding: 12px; }
 .controls { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; margin-bottom:12px; }
 .controls input { padding:6px 8px; }
@@ -9,3 +13,7 @@ ul { list-style: none; padding: 0; }
 li { padding: 4px 0; }
 label { display:block; font-size: 12px; color:#555; }
 #status { margin-left: 12px; color: #2e7d32; }
+small.hint { display:block; color:#777; margin-top:4px; }
+.section-note { color:#999; font-size:0.95rem; margin:4px 0 8px; }
+.hint-link { display:inline-block; margin-top:4px; color:#4caf50; text-decoration:none; }
+.hint-link:hover { text-decoration:underline; }

@@ -3,37 +3,44 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Campus Bus Admin Console</title>
+  <title>Campus Transit Admin</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
-    <h1>Campus Bus Admin Console</h1>
+    <div class="brand">
+      <img src="logo.jpeg" alt="Logo" />
+      <h1>CAMPUS TRANSIT</h1>
+    </div>
+    <p class="subheading">Welcome to admin dashboard</p>
   </header>
   <main>
     <section class="controls">
       <div>
-        <label>Search Map</label>
+        <label>Search Location</label>
         <input id="placeSearch" placeholder="e.g. NIT Trichy" />
         <button id="btnPlaceSearch">Find</button>
         <select id="placeResults"></select>
       </div>
       <div>
-        <label>Search Colleges</label>
-        <input id="searchCollege" placeholder="code or name" />
-        <button id="btnSearch">Search</button>
+        <label>Enter College Code</label>
+        <input id="searchCollege" placeholder="Enter existing college code" />
+        <button id="btnSearch">Load</button>
         <select id="searchResults"></select>
+        <a href="#createCollege" class="hint-link">Don't have one? Create new</a>
       </div>
-      <div>
-        <label>College Code</label>
-        <input id="collegeCode" placeholder="e.g. NITC" />
+      <div id="createCollege" style="display:none;">
+        <div>
+          <label>College Code</label>
+          <input id="collegeCode" placeholder="e.g. NITC" />
+        </div>
+        <div>
+          <label>College Name</label>
+          <input id="collegeName" placeholder="e.g. NIT Calicut" />
+        </div>
+        <button id="btnCreateCollege">Create College</button>
       </div>
-      <div>
-        <label>College Name</label>
-        <input id="collegeName" placeholder="e.g. NIT Calicut" />
-      </div>
-      <button id="saveCollege">Create/Update College</button>
       <span id="status"></span>
     </section>
 
@@ -51,25 +58,26 @@
           <input id="routeName" placeholder="Route name" />
           <input id="routeColor" type="color" value="#f44336" />
           <input id="routeStopIds" placeholder="e.g. s1,s3,s2" />
-          <button id="genTimes">Gen Times</button>
           <button id="addRoute">Add/Update Route</button>
         </div>
-        <div id="routeTimes"></div>
         <div style="margin-top:8px;">
           <label>Bus Name (assigns to this route)</label>
           <input id="routeBusName" placeholder="e.g. Bus 1" />
         </div>
         <ul id="routesList"></ul>
+        <button id="genStopTimes">Generate Stop Times</button>
+        <div id="routeTimes" style="margin-top:8px;"></div>
         <button id="saveRoutes">Save Routes</button>
 
-        <h2>Buses</h2>
+        <h2>Buses & Live Tracking</h2>
+        <p class="section-note">Set up buses for live GPS tracking. Create a bus, generate a driver token, and share the driver tracking page to start location updates.</p>
         <div>
           <input id="busName" placeholder="Bus name" />
-          <input id="busRouteId" placeholder="route id (e.g. lh)" />
-          <button id="addBus">Add/Update Bus</button>
+          <input id="busRouteId" placeholder="Assigned Route (route id, e.g. lh)" />
+          <button id="addBus">Save Bus</button>
         </div>
         <ul id="busesList"></ul>
-        <button id="saveBuses">Save Buses</button>
+        <button id="saveBuses">Save Bus Settings</button>
       </div>
     </section>
   </main>
