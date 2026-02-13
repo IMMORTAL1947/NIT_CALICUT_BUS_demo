@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { haversineMeters } from './haversine.js';
 
-// Load graph JSON for a given college code. Falls back to built-in example.
+// Load graph JSON for a given college code.
 export async function loadGraphForCollege(code, baseDir) {
   // Try multiple candidate graph directories to support both repo-root and server subfolder layouts
   const candidates = [
@@ -12,9 +12,28 @@ export async function loadGraphForCollege(code, baseDir) {
   ];
 
   let filePath = null;
+  const codeStr = String(code || '').trim();
+  const namesToTry = new Set([
+    `${codeStr}.json`,
+    `${codeStr.toLowerCase()}.json`,
+    `${codeStr.toUpperCase()}.json`
+  ]);
+
   for (const dir of candidates) {
-    const p = path.join(dir, `${code}.json`);
-    if (fs.existsSync(p)) { filePath = p; break; }
+    for (const name of namesToTry) {
+      const p = path.join(dir, name);
+      if (fs.existsSync(p)) { filePath = p; break; }
+    }
+    if (filePath) break;
+
+    // Case-insensitive scan for Linux deployments where file casing differs from code casing
+    if (fs.existsSync(dir)) {
+      const matched = fs.readdirSync(dir).find(f => f.toLowerCase() === `${codeStr.toLowerCase()}.json`);
+      if (matched) {
+        filePath = path.join(dir, matched);
+        break;
+      }
+    }
   }
 
   if (filePath && fs.existsSync(filePath)) {
@@ -22,9 +41,8 @@ export async function loadGraphForCollege(code, baseDir) {
     validateGraph(json);
     return json;
   }
-  // Fallback to example graph bundled in code
-  const { exampleGraph } = await awaitImportExample();
-  return exampleGraph;
+
+  throw new Error(`Graph file not found for college '${codeStr}'. Expected in one of: ${candidates.join(', ')}`);
 }
 
 function validateGraph(graph) {
@@ -54,7 +72,3 @@ function validateGraph(graph) {
   }
 }
 
-function awaitImportExample() {
-  // Defer import to avoid ESM hoisting issues
-  return import('./sampleGraph.js');
-}
