@@ -36,7 +36,9 @@
                 android:textStyle="bold"
                 android:textColor="#212121" />
 
+
         </LinearLayout>
+
 
         <!-- Stops Timeline Container -->
         <LinearLayout
@@ -47,6 +49,8 @@
             android:layout_marginTop="16dp"
             android:paddingStart="8dp" />
 
+
     </LinearLayout>
+
 
 </androidx.cardview.widget.CardView>

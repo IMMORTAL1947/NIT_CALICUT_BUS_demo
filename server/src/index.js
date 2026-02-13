@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 import { fileURLToPath } from 'url';
+import { computeRoute } from './routing/index.js';
 
 const app = express();
 app.use(cors());
@@ -247,6 +248,86 @@ app.get('/api/colleges/:code/config', (req, res) => {
   const college = db.colleges[req.params.code];
   if (!college) return res.status(404).json({ error: 'college not found' });
   res.json(college);
+});
+
+// ===== Routing to bus stop =====
+function parseTimeToTodaySeconds(hm) {
+  // hm = 'HH:mm'
+  if (!hm || typeof hm !== 'string') return null;
+  const [hStr, mStr] = hm.split(':');
+  const h = Number(hStr); const m = Number(mStr);
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  return h * 3600 + m * 60;
+}
+
+function estimateBusEtaSeconds(college, stopId) {
+  // Very simple schedule-based ETA: find earliest upcoming stop time today among all routes that include stopId
+  try {
+    const now = new Date();
+    const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+    let bestDelta = null;
+    for (const r of (college.routes || [])) {
+      const hm = r.stopTimes && r.stopTimes[stopId];
+      const sec = parseTimeToTodaySeconds(hm);
+      if (sec == null) continue;
+      let delta = sec - nowSec;
+      if (delta < 0) delta += 24 * 3600; // wrap to next day
+      if (bestDelta == null || delta < bestDelta) bestDelta = delta;
+    }
+    return bestDelta == null ? undefined : bestDelta;
+  } catch {
+    return undefined;
+  }
+}
+
+// GET /api/colleges/:code/route-to-stop
+// Query: userLat, userLng, stopId, mode=shortest|fastest|accessible, algo=dijkstra|astar, optional busEtaSeconds
+app.get('/api/colleges/:code/route-to-stop', async (req, res) => {
+  try {
+    const code = req.params.code;
+    const { userLat, userLng, stopId } = req.query;
+    let { mode, algo } = req.query;
+    mode = (mode || 'shortest').toString();
+    algo = (algo || 'dijkstra').toString();
+    const busEtaSeconds = req.query.busEtaSeconds ? Number(req.query.busEtaSeconds) : undefined;
+
+    if (!userLat || !userLng || !stopId) {
+      return res.status(400).json({ error: 'userLat, userLng, stopId are required' });
+    }
+    const db = readDb();
+    const college = db.colleges[code];
+    if (!college) return res.status(404).json({ error: 'college not found' });
+
+    const eta = typeof busEtaSeconds === 'number' ? busEtaSeconds : estimateBusEtaSeconds(college, String(stopId));
+    // Try to resolve stop coordinates from college config if not present in graph directly
+    let stopLat, stopLng;
+    try {
+      const stopMeta = (college.stops || []).find(s => String(s.id) === String(stopId));
+      if (stopMeta) { stopLat = Number(stopMeta.lat); stopLng = Number(stopMeta.lng); }
+    } catch {}
+    // Temporary override: when using Dijkstra, force a fixed origin point
+    const algoLower = (algo || '').toLowerCase();
+    const useFixedOriginForDijkstra = algoLower === 'dijkstra';
+    const effectiveUserLat = useFixedOriginForDijkstra ? 11.321071 : Number(userLat);
+    const effectiveUserLng = useFixedOriginForDijkstra ? 75.934531 : Number(userLng);
+
+    const result = await computeRoute({
+      baseDir: ROOT_DIR,
+      collegeCode: code,
+      userLat: effectiveUserLat,
+      userLng: effectiveUserLng,
+      stopId: String(stopId),
+      stopLat,
+      stopLng,
+      mode,
+      algo,
+      busEtaSeconds: eta
+    });
+    if (result && result.error) return res.status(400).json(result);
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // Serve Admin Dashboard statically at root if available

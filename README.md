@@ -43,6 +43,11 @@ npm run dev
 - College Code: `NITC`
 - Server URL: your Render URL (e.g., `https://your-app.onrender.com`), or `http://10.0.2.2:3000` for local.
 
+## Campus routing API
+- Endpoint: `GET /api/colleges/:code/route-to-stop`
+- Query params: `userLat`, `userLng`, `stopId`, `mode=shortest|fastest|accessible`, `algo=dijkstra|astar`
+- Response includes ordered nodes, total distance, estimated time, and steps. See `server/README-routing.md` for details.
+
 More deployment options: see `server/README_DEPLOY.md`.
 
 ## Switching Deployment Mode

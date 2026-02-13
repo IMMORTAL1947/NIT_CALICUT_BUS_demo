@@ -8,9 +8,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="College Settings"
+        android:text="Settings"
         android:textStyle="bold"
-        android:textSize="18sp"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
         android:layout_marginBottom="12dp" />
 
     <TextView

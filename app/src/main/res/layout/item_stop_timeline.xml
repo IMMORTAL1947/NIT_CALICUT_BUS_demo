@@ -1,52 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:padding="8dp">
 
-    <!-- Timeline Column -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/leftColumn"
+        android:layout_width="24dp"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:orientation="vertical">
 
-        <!-- Stop Number Circle -->
-        <TextView
-            android:id="@+id/stopNumber"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:text="1"
-            android:gravity="center"
-            android:textColor="@android:color/white"
-            android:background="@drawable/circle_background"
-            android:textStyle="bold"
-            android:textSize="14sp" />
+        <View
+            android:id="@+id/statusDot"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/circle_upcoming" />
 
-        <!-- Timeline Line -->
         <View
             android:id="@+id/timelineLine"
             android:layout_width="2dp"
-            android:layout_height="40dp"
-            android:background="#BDBDBD"
-            android:layout_marginTop="2dp" />
-
+            android:layout_height="match_parent"
+            android:layout_marginStart="11dp"
+            android:layout_marginTop="4dp"
+            android:background="#E0E0E0" />
     </LinearLayout>
 
-    <!-- Stop Name -->
-    <TextView
-        android:id="@+id/stopNameText"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/rightColumn"
+        android:layout_toRightOf="@id/leftColumn"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Bus Stop Name"
-        android:textSize="16sp"
-        android:textColor="#424242"
-        android:layout_marginStart="16dp"
-        android:layout_gravity="center_vertical"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp" />
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/stopNameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop Name"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/stopTimeText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="08:30"
+            android:textSize="12sp"
+            android:textColor="#607D8B" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/busIndicator"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignLeft="@id/timelineLine"
+        android:layout_centerVertical="true"
+        android:src="@android:drawable/ic_dialog_map"
+        android:visibility="invisible" />
+
+</RelativeLayout>
+

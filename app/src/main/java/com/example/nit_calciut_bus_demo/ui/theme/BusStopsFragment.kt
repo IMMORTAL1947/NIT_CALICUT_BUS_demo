@@ -1,26 +1,34 @@
 package com.example.nit_calciut_bus_demo.ui.theme
 
+import android.animation.ValueAnimator
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Log
-import android.widget.Toast
+import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.nit_calciut_bus_demo.R
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
-class BusStopsFragment : Fragment(), OnMapReadyCallback {
+class BusStopsFragment : Fragment() {
 
-    private lateinit var mMap: GoogleMap
+    private lateinit var stopsMap: GoogleMap
+    private lateinit var liveMap: GoogleMap
     private val liveMarkers: MutableMap<String, Marker> = mutableMapOf()
     private var livePollingThread: Thread? = null
+    private var userLocation: Location? = null
+
+    private val stopItems: MutableList<Pair<String, LatLng>> = mutableListOf()
+    private val busMeta: MutableMap<String, Pair<String, String>> = mutableMapOf() // busId -> (busName, routeId)
+    private val busLastTs: MutableMap<String, Long> = mutableMapOf()
 
     companion object {}
 
@@ -34,50 +42,61 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+        val fused = LocationServices.getFusedLocationProviderClient(requireContext())
+        fused.lastLocation.addOnSuccessListener { loc ->
+            if (loc != null) {
+                userLocation = loc
+            }
+        }
+
+        val stopsFrag = childFragmentManager.findFragmentById(R.id.stopsMap) as SupportMapFragment
+        stopsFrag.getMapAsync { map ->
+            stopsMap = map
+            configureMapUi(stopsMap)
+            loadAndRenderStops()
+        }
+
+        val liveFrag = childFragmentManager.findFragmentById(R.id.liveMap) as SupportMapFragment
+        liveFrag.getMapAsync { map ->
+            liveMap = map
+            configureMapUi(liveMap)
+            startLivePolling()
+        }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        
-        // Configure map settings
-        mMap.uiSettings.apply {
+    private fun configureMapUi(map: GoogleMap) {
+        map.uiSettings.apply {
             isZoomControlsEnabled = true
             isMapToolbarEnabled = true
             isCompassEnabled = true
         }
-
-        // Set up marker click listener
-        mMap.setOnMarkerClickListener { marker ->
+        map.setOnMarkerClickListener { marker ->
             marker.showInfoWindow()
             true
         }
-
-    // Try to load from backend using college code; if it fails, show an error toast
-    loadAndRenderStops()
-    startLivePolling()
-
-        // Camera will be centered to fetched stops when available
     }
 
     private fun addBusStopMarkers(stops: List<Pair<LatLng, String>>) {
-        val busIcon = getScaledBusIcon(28)
+        val stopIcon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
 
         val boundsBuilder = LatLngBounds.Builder()
         stops.forEach { (position, title) ->
-            mMap.addMarker(MarkerOptions()
-                .position(position)
-                .title(title)
-                .icon(busIcon)
-                .anchor(0.5f, 0.5f))
+            stopsMap.addMarker(
+                MarkerOptions()
+                    .position(position)
+                    .title(title)
+                    .icon(stopIcon)
+                    .anchor(0.5f, 0.5f)
+            )
             boundsBuilder.include(position)
         }
         if (stops.isNotEmpty()) {
             val bounds = boundsBuilder.build()
             val padding = 100
-            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
+            stopsMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
         }
+        stopItems.clear()
+        stops.forEach { (pos, name) -> stopItems.add(Pair(name, pos)) }
     }
 
     private fun loadAndRenderStops() {
@@ -107,6 +126,15 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
                         val lng = s.getDouble("lng")
                         val name = s.getString("name")
                         stopsList.add(Pair(LatLng(lat, lng), name))
+                    }
+                    busMeta.clear()
+                    val busesJson = json.optJSONArray("buses") ?: org.json.JSONArray()
+                    for (i in 0 until busesJson.length()) {
+                        val b = busesJson.getJSONObject(i)
+                        val id = b.getString("id")
+                        val name = b.getString("name")
+                        val routeId = b.optString("routeId", "")
+                        busMeta[id] = Pair(name, routeId)
                     }
                     requireActivity().runOnUiThread {
                         if (stopsList.isNotEmpty()) {
@@ -151,7 +179,10 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
                         val positions = mutableListOf<Triple<String, Double, Double>>()
                         for (i in 0 until arr.length()) {
                             val o = arr.getJSONObject(i)
-                            positions.add(Triple(o.getString("busId"), o.getDouble("lat"), o.getDouble("lng")))
+                            val id = o.getString("busId")
+                            positions.add(Triple(id, o.getDouble("lat"), o.getDouble("lng")))
+                            val ts = o.optLong("ts", System.currentTimeMillis())
+                            busLastTs[id] = ts
                         }
                         requireActivity().runOnUiThread {
                             updateLiveMarkers(positions)
@@ -169,17 +200,30 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun updateLiveMarkers(positions: List<Triple<String, Double, Double>>) {
-        val icon = getScaledBusIcon(32)
+        val icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
         for ((busId, lat, lng) in positions) {
             val pos = LatLng(lat, lng)
             val existing = liveMarkers[busId]
             if (existing != null) {
-                existing.position = pos
+                animateMarkerTo(existing, pos)
             } else {
-                val marker = mMap.addMarker(MarkerOptions().position(pos).icon(icon).title("Bus: $busId"))
+                val marker = liveMap.addMarker(MarkerOptions().position(pos).icon(icon).title("Bus: $busId"))
                 if (marker != null) liveMarkers[busId] = marker
             }
         }
+    }
+
+    private fun animateMarkerTo(marker: Marker, toPos: LatLng) {
+        val from = marker.position
+        val animator = ValueAnimator.ofFloat(0f, 1f)
+        animator.duration = 500
+        animator.addUpdateListener { va ->
+            val t = va.animatedValue as Float
+            val lat = from.latitude + (toPos.latitude - from.latitude) * t
+            val lng = from.longitude + (toPos.longitude - from.longitude) * t
+            marker.position = LatLng(lat, lng)
+        }
+        animator.start()
     }
 
     override fun onDestroyView() {
@@ -189,10 +233,13 @@ class BusStopsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun getScaledBusIcon(dpSize: Int = 28): BitmapDescriptor {
-        val density = resources.displayMetrics.density
-        val px = (dpSize * density).toInt().coerceAtLeast(24)
-        val original = BitmapFactory.decodeResource(resources, R.drawable.bus)
-        val scaled = Bitmap.createScaledBitmap(original, px, px, true)
-        return BitmapDescriptorFactory.fromBitmap(scaled)
+        // Fallback to default marker to avoid missing drawable resource
+        return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
+    }
+
+    private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        val res = FloatArray(1)
+        Location.distanceBetween(lat1, lon1, lat2, lon2, res)
+        return res[0]
     }
 }

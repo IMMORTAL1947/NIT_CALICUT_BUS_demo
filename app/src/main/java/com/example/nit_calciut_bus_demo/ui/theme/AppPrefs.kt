@@ -17,13 +17,23 @@ object AppPrefs {
     }
 
     fun getServerUrl(context: Context): String =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_SERVER_URL, defaultServer()) ?: defaultServer()
+        normalizeServerUrl(
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString(KEY_SERVER_URL, defaultServer()) ?: defaultServer()
+        )
 
     fun setServerUrl(context: Context, url: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(KEY_SERVER_URL, url.trim().removeSuffix("/")).apply()
+            .edit().putString(KEY_SERVER_URL, normalizeServerUrl(url)).apply()
     }
 
     private fun defaultServer(): String = "http://10.0.2.2:3000"
+
+    private fun normalizeServerUrl(url: String): String {
+        var u = url.trim().removeSuffix("/")
+        if (u.endsWith("/api", ignoreCase = true)) {
+            u = u.dropLast(4).removeSuffix("/")
+        }
+        return u
+    }
 }
