@@ -111,7 +111,6 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
   })();
 
   let bestResult = null;
-  let bestGoalId = null;
   let pathIds = null;
   const startTry = [startId, ...startCandidates].filter(Boolean);
   const goalTry = [goalId, ...goalCandidates].filter(Boolean);
@@ -123,19 +122,8 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
         ? runAStar(graph, sId, gId, mode, options)
         : runDijkstra(graph, sId, gId, mode, options);
       if (result.pathNodeIds && result.pathNodeIds.length > 0) {
-        const goalNode = nodeMap.get(gId);
-        const connectorDist = (typeof stopLat === 'number' && typeof stopLng === 'number' && goalNode)
-          ? haversineMeters({ lat: goalNode.lat, lng: goalNode.lng }, { lat: Number(stopLat), lng: Number(stopLng) })
-          : 0;
-        const score = result.totalDistance + connectorDist;
-        const bestGoalNode = bestGoalId ? nodeMap.get(bestGoalId) : null;
-        const bestConnectorDist = (typeof stopLat === 'number' && typeof stopLng === 'number' && bestGoalNode)
-          ? haversineMeters({ lat: bestGoalNode.lat, lng: bestGoalNode.lng }, { lat: Number(stopLat), lng: Number(stopLng) })
-          : 0;
-        const bestScore = bestResult ? (bestResult.totalDistance + bestConnectorDist) : Infinity;
-        if (!bestResult || score < bestScore) {
+        if (!bestResult || result.totalDistance < bestResult.totalDistance) {
           bestResult = result;
-          bestGoalId = gId;
           pathIds = result.pathNodeIds;
         }
         if (sId === startId && gId === goalId) break outer;
@@ -157,7 +145,6 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
             : runDijkstra(graph, forcedStart, gId, mode, options);
           if (r.pathNodeIds && r.pathNodeIds.length > 0) {
             bestResult = r;
-            bestGoalId = gId;
             pathIds = r.pathNodeIds;
             break;
           }
@@ -175,37 +162,10 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
     return { id, lat: n?.lat, lng: n?.lng, name: n?.name };
   });
 
-  let totalDistance = bestResult?.totalDistance ?? 0;
-  if (typeof stopLat === 'number' && typeof stopLng === 'number' && nodes.length > 0) {
-    const last = nodes[nodes.length - 1];
-    const connector = haversineMeters(
-      { lat: Number(last.lat), lng: Number(last.lng) },
-      { lat: Number(stopLat), lng: Number(stopLng) }
-    );
-    if (connector > 5) {
-      nodes.push({
-        id: `stop_${String(stopId)}`,
-        lat: Number(stopLat),
-        lng: Number(stopLng),
-        name: `Stop ${String(stopId)}`
-      });
-      totalDistance += connector;
-    }
-  }
+  const totalDistance = bestResult?.totalDistance ?? 0;
   const estTime = Math.round(estimatePathTimeSeconds(totalDistance, options.walkSpeedMps));
   const reason = chooseReason(mode);
   const steps = generateSteps(graph, pathIds);
-  if (nodes.length >= 2) {
-    const prev = nodes[nodes.length - 2];
-    const last = nodes[nodes.length - 1];
-    if (String(last.id).startsWith('stop_')) {
-      const connector = haversineMeters(
-        { lat: Number(prev.lat), lng: Number(prev.lng) },
-        { lat: Number(last.lat), lng: Number(last.lng) }
-      );
-      steps.push(`Walk from ${prev.name || prev.id} to selected stop (~${Math.round(connector)} m)`);
-    }
-  }
 
   return {
     nodes,
