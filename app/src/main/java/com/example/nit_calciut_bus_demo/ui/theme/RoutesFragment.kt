@@ -234,7 +234,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3');")
+        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3', false);")
     }
 
     private fun ensureLocationAndFetch() {
@@ -291,7 +291,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63');")
+        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63', true);")
     }
 
     private fun openGoogleMapsToSelectedStop() {

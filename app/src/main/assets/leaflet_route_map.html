@@ -19,6 +19,7 @@
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
+    let routeLayer = null;
     let stopsLayer = L.layerGroup().addTo(map);
     let busMarker = null;
 
@@ -30,10 +31,21 @@
       }
     }
 
-    window.renderRoute = function(routePoints, stopMarkers, colorHex) {
+    window.renderRoute = function(routePoints, stopMarkers, colorHex, showPolyline) {
+      if (routeLayer) {
+        map.removeLayer(routeLayer);
+        routeLayer = null;
+      }
       stopsLayer.clearLayers();
 
       const allPoints = [];
+
+      if (showPolyline === true && Array.isArray(routePoints) && routePoints.length > 0) {
+        routeLayer = L.polyline(routePoints.map(p => [p.lat, p.lng]), {
+          color: colorHex || '#2196F3',
+          weight: 6
+        }).addTo(map);
+      }
 
       if (Array.isArray(routePoints) && routePoints.length > 0) {
         allPoints.push(...routePoints);

@@ -14,6 +14,16 @@ function nearestNodeId(graph, lat, lng) {
   return best;
 }
 
+function nearestNodeCandidates(graph, lat, lng, limit = 8) {
+  const ranked = [];
+  for (const n of graph.nodes) {
+    const d = haversineMeters({ lat, lng }, { lat: n.lat, lng: n.lng });
+    ranked.push({ id: n.id, dist: d });
+  }
+  ranked.sort((a, b) => a.dist - b.dist);
+  return ranked.slice(0, limit).map(x => x.id);
+}
+
 function findStopNode(graph, stopId) {
   const sid = String(stopId);
   const numMatch = sid.match(/^s(\d+)$/);
@@ -45,12 +55,37 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
   };
 
   const t0 = Date.now();
-  const result = algo === 'astar'
-    ? runAStar(graph, startId, goalId, mode, options)
-    : runDijkstra(graph, startId, goalId, mode, options);
+  const startCandidates = nearestNodeCandidates(graph, Number(userLat), Number(userLng), 10);
+  const goalCandidates = (() => {
+    if (stopNode?.id) return [stopNode.id];
+    if (typeof stopLat === 'number' && typeof stopLng === 'number') {
+      return nearestNodeCandidates(graph, Number(stopLat), Number(stopLng), 10);
+    }
+    return goalId ? [goalId] : [];
+  })();
+
+  let bestResult = null;
+  let pathIds = null;
+  const startTry = [startId, ...startCandidates].filter(Boolean);
+  const goalTry = [goalId, ...goalCandidates].filter(Boolean);
+
+  outer:
+  for (const sId of startTry) {
+    for (const gId of goalTry) {
+      const result = algo === 'astar'
+        ? runAStar(graph, sId, gId, mode, options)
+        : runDijkstra(graph, sId, gId, mode, options);
+      if (result.pathNodeIds && result.pathNodeIds.length > 0) {
+        if (!bestResult || result.totalDistance < bestResult.totalDistance) {
+          bestResult = result;
+          pathIds = result.pathNodeIds;
+        }
+        if (sId === startId && gId === goalId) break outer;
+      }
+    }
+  }
   const tMs = Date.now() - t0;
 
-  let pathIds = result.pathNodeIds;
   if (!pathIds || pathIds.length === 0) {
     return { error: 'no path found between user and selected stop' };
   }
@@ -60,7 +95,7 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
     return { id, lat: n?.lat, lng: n?.lng, name: n?.name };
   });
 
-  const totalDistance = result.totalDistance;
+  const totalDistance = bestResult?.totalDistance ?? 0;
   const estTime = Math.round(estimatePathTimeSeconds(totalDistance, options.walkSpeedMps));
   const reason = chooseReason(mode);
   const steps = generateSteps(graph, pathIds);
@@ -73,6 +108,6 @@ export async function computeRoute({ baseDir, collegeCode, userLat, userLng, sto
     estimatedTime: estTime,
     reason,
     steps,
-    performance: { algo, nodesVisited: result.visitedCount, timeMs: tMs }
+    performance: { algo, nodesVisited: bestResult?.visitedCount ?? 0, timeMs: tMs }
   };
 }
