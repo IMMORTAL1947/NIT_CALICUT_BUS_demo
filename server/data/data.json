@@ -97,6 +97,19 @@
             "s2"
           ],
           "stopTimes": {}
+        },
+        {
+          "id": "newmbh",
+          "name": "NEWMBH",
+          "color": "#f44336",
+          "stopIds": [
+            "s9",
+            "s2",
+            "s3",
+            "s4",
+            "s8"
+          ],
+          "stopTimes": {}
         }
       ],
       "buses": [
@@ -105,6 +118,11 @@
           "name": "BUS1",
           "routeId": "SOMS",
           "driverToken": "70oxMJNCPBRvcVtGl-4QFS6Z"
+        },
+        {
+          "id": "newmbh",
+          "name": "NEWMBH",
+          "routeId": "newmbh"
         }
       ]
     },
