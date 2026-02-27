@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    html, body, #map { height: 100%; width: 100%; margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    const map = L.map('map', { zoomControl: true }).setView([11.321, 75.934], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 20,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let routeLayer = null;
+    let stopsLayer = L.layerGroup().addTo(map);
+    let busMarker = null;
+
+    function fitIfNeeded(points) {
+      if (!points || points.length === 0) return;
+      const bounds = L.latLngBounds(points.map(p => [p.lat, p.lng]));
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [24, 24] });
+      }
+    }
+
+    window.renderRoute = function(routePoints, stopMarkers, colorHex) {
+      if (routeLayer) {
+        map.removeLayer(routeLayer);
+        routeLayer = null;
+      }
+      stopsLayer.clearLayers();
+
+      const allPoints = [];
+
+      if (Array.isArray(routePoints) && routePoints.length > 0) {
+        routeLayer = L.polyline(routePoints.map(p => [p.lat, p.lng]), {
+          color: colorHex || '#2196F3',
+          weight: 6
+        }).addTo(map);
+        allPoints.push(...routePoints);
+      }
+
+      if (Array.isArray(stopMarkers)) {
+        stopMarkers.forEach(s => {
+          const marker = L.marker([s.lat, s.lng]);
+          if (s.name) marker.bindPopup(s.name);
+          marker.addTo(stopsLayer);
+          allPoints.push({ lat: s.lat, lng: s.lng });
+        });
+      }
+
+      if (busMarker) {
+        const p = busMarker.getLatLng();
+        allPoints.push({ lat: p.lat, lng: p.lng });
+      }
+
+      fitIfNeeded(allPoints);
+    }
+
+    window.updateBusMarker = function(bus) {
+      if (!bus || typeof bus.lat !== 'number' || typeof bus.lng !== 'number') {
+        if (busMarker) {
+          map.removeLayer(busMarker);
+          busMarker = null;
+        }
+        return;
+      }
+
+      const pos = [bus.lat, bus.lng];
+      if (!busMarker) {
+        busMarker = L.circleMarker(pos, {
+          radius: 8,
+          color: '#0277BD',
+          fillColor: '#03A9F4',
+          fillOpacity: 0.95,
+          weight: 2
+        }).addTo(map).bindPopup('Live Bus');
+      } else {
+        busMarker.setLatLng(pos);
+      }
+    }
+  </script>
+</body>
+</html>

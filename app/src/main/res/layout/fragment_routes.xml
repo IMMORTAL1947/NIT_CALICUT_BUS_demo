@@ -77,7 +77,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Google Maps" />
+                    android:text="OpenStreetMap" />
 
                 <RadioButton
                     android:id="@+id/routingModeCampus"
@@ -91,15 +91,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
-                android:text="Uses campus-specific paths not available in Google Maps"
+                android:text="Uses campus-specific paths not available in default map view"
                 android:textColor="#607D8B"
                 android:textSize="12sp"
                 android:visibility="gone" />
         </LinearLayout>
 
-        <fragment
-            android:id="@+id/routeMap"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <WebView
+            android:id="@+id/routeMapWebView"
             android:layout_width="match_parent"
             android:layout_height="205dp" />
 

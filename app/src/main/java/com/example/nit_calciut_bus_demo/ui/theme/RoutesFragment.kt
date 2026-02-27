@@ -1,6 +1,5 @@
 package com.example.nit_calciut_bus_demo.ui.theme
 
-import android.animation.ValueAnimator
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,25 +18,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.example.nit_calciut_bus_demo.R
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import org.json.JSONArray
+import org.json.JSONObject
 
 class RoutesFragment : Fragment() {
 
     private lateinit var viewModel: RoutesViewModel
     private lateinit var stopsAdapter: StopsTimelineAdapter
     private lateinit var stepsAdapter: StepsAdapter
-    private var routeMap: GoogleMap? = null
-    private var busMarker: Marker? = null
+    private var routeMapWebView: WebView? = null
+    private var isLeafletReady: Boolean = false
     private var userLocation: Location? = null
     private var selectedRoutingMode: RoutingMode = RoutingMode.GOOGLE
     private var pendingStopIndex: Int? = null
@@ -84,15 +79,14 @@ class RoutesFragment : Fragment() {
                 if (dest != null) {
                     try {
                         val uri = if (src != null) {
-                            android.net.Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${src.latitude},${src.longitude}&destination=${dest.latitude},${dest.longitude}&travelmode=walking")
+                            android.net.Uri.parse("https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${src.latitude},${src.longitude};${dest.latitude},${dest.longitude}")
                         } else {
-                            android.net.Uri.parse("https://www.google.com/maps/dir/?api=1&destination=${dest.latitude},${dest.longitude}&travelmode=walking")
+                            android.net.Uri.parse("https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=18/${dest.latitude}/${dest.longitude}")
                         }
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
-                        intent.setPackage("com.google.android.apps.maps")
                         startActivity(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(requireContext(), "Open in Google Maps failed", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), "Open in OpenStreetMap failed", Toast.LENGTH_LONG).show()
                     }
                 }
             } else {
@@ -112,13 +106,9 @@ class RoutesFragment : Fragment() {
         stepsAdapter = StepsAdapter()
         stepsRecycler.adapter = stepsAdapter
 
-        val mapFrag = childFragmentManager.findFragmentById(R.id.routeMap) as SupportMapFragment
-        mapFrag.getMapAsync { map ->
-            routeMap = map
-            configureMapUi(map)
-            // When map is ready, load config and render
-            viewModel.loadConfig(requireContext())
-        }
+        val webView = view.findViewById<WebView>(R.id.routeMapWebView)
+        routeMapWebView = webView
+        setupLeafletMap(webView)
 
         val routingModeGroup = view.findViewById<RadioGroup>(R.id.routingModeGroup)
         val routingModeNote = view.findViewById<TextView>(R.id.routingModeNote)
@@ -207,41 +197,30 @@ class RoutesFragment : Fragment() {
             selectedRoutingMode = mode
             viewModel.setRoutingMode(mode)
         }
+
+        // Load config immediately; WebView rendering will occur when ready.
+        viewModel.loadConfig(requireContext())
     }
 
     private fun renderRouteOnMap(points: List<LatLng>, stops: List<Pair<LatLng, String>>) {
-        val map = routeMap ?: return
-        map.clear()
-        if (points.isNotEmpty()) {
-            map.addPolyline(
-                PolylineOptions().addAll(points).width(8f).color(0xFF2196F3.toInt())
-            )
+        val routeJson = JSONArray().apply {
+            points.forEach { p ->
+                put(JSONObject().apply {
+                    put("lat", p.latitude)
+                    put("lng", p.longitude)
+                })
+            }
         }
-        val boundsBuilder = LatLngBounds.Builder()
-        stops.forEach { (pos, name) ->
-            map.addMarker(
-                MarkerOptions()
-                    .position(pos)
-                    .title(name)
-            )
-            boundsBuilder.include(pos)
+        val stopsJson = JSONArray().apply {
+            stops.forEach { (pos, name) ->
+                put(JSONObject().apply {
+                    put("lat", pos.latitude)
+                    put("lng", pos.longitude)
+                    put("name", name)
+                })
+            }
         }
-        if (stops.isNotEmpty()) {
-            val bounds = boundsBuilder.build()
-            val padding = 100
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
-        }
-    }
-
-    private fun configureMapUi(map: GoogleMap) {
-        map.uiSettings.apply {
-            isZoomControlsEnabled = true
-            isMapToolbarEnabled = true
-            isCompassEnabled = true
-        }
-        val fineGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        val coarseGranted = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        map.isMyLocationEnabled = fineGranted || coarseGranted
+        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3');")
     }
 
     private fun ensureLocationAndFetch() {
@@ -290,15 +269,15 @@ class RoutesFragment : Fragment() {
     }
 
     private fun renderDijkstraOnMap(path: List<LatLng>) {
-        val map = routeMap ?: return
-        map.clear()
-        if (path.isNotEmpty()) {
-            map.addPolyline(
-                PolylineOptions().addAll(path).width(10f).color(0xFFE91E63.toInt())
-            )
-            val bounds = LatLngBounds.builder().apply { path.forEach { include(it) } }.build()
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        val pathJson = JSONArray().apply {
+            path.forEach { p ->
+                put(JSONObject().apply {
+                    put("lat", p.latitude)
+                    put("lng", p.longitude)
+                })
+            }
         }
+        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63');")
     }
 
     private fun openGoogleMapsToSelectedStop() {
@@ -309,45 +288,56 @@ class RoutesFragment : Fragment() {
         val src = userLocation
         try {
             val uri = if (src != null) {
-                android.net.Uri.parse("https://www.google.com/maps/dir/?api=1&origin=${src.latitude},${src.longitude}&destination=${dest.latitude},${dest.longitude}&travelmode=walking")
+                android.net.Uri.parse("https://www.openstreetmap.org/directions?engine=fossgis_osrm_foot&route=${src.latitude},${src.longitude};${dest.latitude},${dest.longitude}")
             } else {
-                android.net.Uri.parse("https://www.google.com/maps/dir/?api=1&destination=${dest.latitude},${dest.longitude}&travelmode=walking")
+                android.net.Uri.parse("https://www.openstreetmap.org/?mlat=${dest.latitude}&mlon=${dest.longitude}#map=18/${dest.latitude}/${dest.longitude}")
             }
             val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
-            intent.setPackage("com.google.android.apps.maps")
             startActivity(intent)
         } catch (_: Exception) {
-            Toast.makeText(requireContext(), "Open in Google Maps failed", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Open in OpenStreetMap failed", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun updateBusMarker(pos: LatLng?) {
-        val map = routeMap ?: return
         if (pos == null) {
-            busMarker?.remove()
-            busMarker = null
+            evalLeafletJs("window.updateBusMarker(null);")
             return
         }
-        val icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-        val existing = busMarker
-        if (existing == null) {
-            busMarker = map.addMarker(MarkerOptions().position(pos).icon(icon).title("Live Bus"))
-        } else {
-            animateMarkerTo(existing, pos)
-        }
+        evalLeafletJs("window.updateBusMarker({lat:${pos.latitude},lng:${pos.longitude}});")
     }
 
-    private fun animateMarkerTo(marker: Marker, toPos: LatLng) {
-        val from = marker.position
-        val animator = ValueAnimator.ofFloat(0f, 1f)
-        animator.duration = 500
-        animator.addUpdateListener { va ->
-            val t = va.animatedValue as Float
-            val lat = from.latitude + (toPos.latitude - from.latitude) * t
-            val lng = from.longitude + (toPos.longitude - from.longitude) * t
-            marker.position = LatLng(lat, lng)
+    private fun setupLeafletMap(webView: WebView) {
+        webView.settings.javaScriptEnabled = true
+        webView.settings.domStorageEnabled = true
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                isLeafletReady = true
+                val state = viewModel.uiState.value
+                if (state != null) {
+                    if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraPath.isNotEmpty()) {
+                        renderDijkstraOnMap(state.dijkstraPath)
+                    } else {
+                        renderRouteOnMap(state.routePoints, state.stopMarkers)
+                    }
+                    updateBusMarker(state.busLatLng)
+                }
+            }
         }
-        animator.start()
+        webView.loadUrl("file:///android_asset/leaflet_route_map.html")
+    }
+
+    private fun evalLeafletJs(script: String) {
+        if (!isLeafletReady) return
+        routeMapWebView?.evaluateJavascript(script, null)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        routeMapWebView?.destroy()
+        routeMapWebView = null
+        isLeafletReady = false
     }
 }
 
