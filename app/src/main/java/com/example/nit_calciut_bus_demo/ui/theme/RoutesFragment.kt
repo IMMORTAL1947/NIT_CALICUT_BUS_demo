@@ -198,6 +198,14 @@ class RoutesFragment : Fragment() {
             viewModel.setRoutingMode(mode)
         }
 
+        busSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.selectBus(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+
         // Load config immediately; WebView rendering will occur when ready.
         viewModel.loadConfig(requireContext())
     }
@@ -220,7 +228,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3');")
+        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3', false);")
     }
 
     private fun ensureLocationAndFetch() {
@@ -277,7 +285,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63');")
+        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63', true);")
     }
 
     private fun openGoogleMapsToSelectedStop() {
