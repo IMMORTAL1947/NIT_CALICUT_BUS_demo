@@ -33,6 +33,7 @@ class RoutesFragment : Fragment() {
     private lateinit var stepsAdapter: StepsAdapter
     private var routeMapWebView: WebView? = null
     private var isLeafletReady: Boolean = false
+    private var ignoreBusSelectionEvent: Boolean = false
     private var userLocation: Location? = null
     private var selectedRoutingMode: RoutingMode = RoutingMode.GOOGLE
     private var pendingStopIndex: Int? = null
@@ -126,6 +127,7 @@ class RoutesFragment : Fragment() {
                 busSelector.adapter = adapter
                 // Default selection
                 val defIndex = state.defaultBusIndex.coerceIn(0, names.size - 1)
+                ignoreBusSelectionEvent = true
                 busSelector.setSelection(defIndex)
             }
             // Update routing mode selector without triggering listener loops
@@ -196,6 +198,18 @@ class RoutesFragment : Fragment() {
             val mode = if (checkedId == R.id.routingModeCampus) RoutingMode.DIJKSTRA else RoutingMode.GOOGLE
             selectedRoutingMode = mode
             viewModel.setRoutingMode(mode)
+        }
+
+        busSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (ignoreBusSelectionEvent) {
+                    ignoreBusSelectionEvent = false
+                    return
+                }
+                viewModel.selectBus(position)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
         // Load config immediately; WebView rendering will occur when ready.

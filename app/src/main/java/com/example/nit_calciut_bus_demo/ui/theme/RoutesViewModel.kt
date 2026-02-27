@@ -189,9 +189,11 @@ class RoutesViewModel : ViewModel() {
         }
         val routesArr = json.getJSONArray("routes")
         var chosenRoute: JSONObject? = null
+        val routeIdNorm = routeId?.lowercase()
         for (i in 0 until routesArr.length()) {
             val r = routesArr.getJSONObject(i)
-            if (routeId == null || r.getString("id") == routeId) {
+            val rid = r.optString("id", "")
+            if (routeIdNorm == null || rid.lowercase() == routeIdNorm) {
                 chosenRoute = r
                 break
             }
