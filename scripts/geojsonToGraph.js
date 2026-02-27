@@ -2,7 +2,7 @@
  * GeoJSON → Graph converter for campus routing
  *
  * Usage:
- *   node scripts/geojsonToGraph.js <geojsonPath> [--code=<collegeCode>] [--name=<College Name>]
+ *   node scripts/geojsonToGraph.js <geojsonPath> [--code=<collegeCode>] [--name=<College Name>] [--snapTol=<meters>]
  *
  * Requirements implemented:
  * - Parses GeoJSON (FeatureCollection with LineString features) of walkable paths
@@ -57,15 +57,17 @@ function nodeIdFromCoord(lat, lng, decimals = 6) {
 }
 
 function parseArgs(argv) {
-  const args = { file: null, code: 'nitc', name: null };
+  const args = { file: null, code: 'nitc', name: null, snapTol: 70 };
   const positional = [];
   for (const a of argv.slice(2)) {
     if (a.startsWith('--code=')) args.code = a.split('=')[1];
     else if (a.startsWith('--name=')) args.name = a.split('=')[1];
+    else if (a.startsWith('--snapTol=')) args.snapTol = Number(a.split('=')[1]);
     else positional.push(a);
   }
   if (positional[0]) args.file = positional[0];
   if (!args.name) args.name = args.code;
+  if (!Number.isFinite(args.snapTol) || args.snapTol <= 0) args.snapTol = 70;
   return args;
 }
 
@@ -223,9 +225,9 @@ function validateGraph(nodesArray, edgesArray, stopNodeIds) {
 
 // ---------- Main ----------
 async function main() {
-  const { file, code, name } = parseArgs(process.argv);
+  const { file, code, name, snapTol } = parseArgs(process.argv);
   if (!file) {
-    console.error('Usage: node scripts/geojsonToGraph.js <geojsonPath> [--code=<collegeCode>] [--name=<College Name>]');
+    console.error('Usage: node scripts/geojsonToGraph.js <geojsonPath> [--code=<collegeCode>] [--name=<College Name>] [--snapTol=<meters>]');
     process.exit(1);
   }
 
@@ -243,7 +245,7 @@ async function main() {
   try { stopsInfo = await readCollegeConfig(repoRoot, code); } catch (e) { console.warn(e.message); }
 
   // Snap bus stops
-  const { snappedCount, stopNodeIds } = snapStopsToGraph(stopsInfo.stops, nodesArray, edgesArray, 70);
+  const { snappedCount, stopNodeIds } = snapStopsToGraph(stopsInfo.stops, nodesArray, edgesArray, snapTol);
 
   // Validate
   const errors = validateGraph(nodesArray, edgesArray, stopNodeIds);
@@ -269,6 +271,7 @@ async function main() {
   console.log(` - Total nodes: ${nodesArray.length}`);
   console.log(` - Total edges: ${edgesArray.length}`);
   console.log(` - Bus stops snapped: ${snappedCount}`);
+  console.log(` - Snap tolerance: ${snapTol}m`);
   console.log(` - Output: ${outFile}`);
 }
 
