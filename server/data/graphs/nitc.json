@@ -6,6 +6,69 @@
   },
   "nodes": [
     {
+      "id": "n_11p320426_75p937221",
+      "name": "n_11p320426_75p937221",
+      "lat": 11.320426,
+      "lng": 75.937221,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p320132_75p937242",
+      "name": "n_11p320132_75p937242",
+      "lat": 11.320132,
+      "lng": 75.937242,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319860_75p937235",
+      "name": "n_11p319860_75p937235",
+      "lat": 11.31986,
+      "lng": 75.937235,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319613_75p937224",
+      "name": "n_11p319613_75p937224",
+      "lat": 11.319613,
+      "lng": 75.937224,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319509_75p937204",
+      "name": "n_11p319509_75p937204",
+      "lat": 11.319509,
+      "lng": 75.937204,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319871_75p933444",
+      "name": "n_11p319871_75p933444",
+      "lat": 11.319871,
+      "lng": 75.933444,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319932_75p932562",
+      "name": "n_11p319932_75p932562",
+      "lat": 11.319932,
+      "lng": 75.932562,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319803_75p932023",
+      "name": "n_11p319803_75p932023",
+      "lat": 11.319803,
+      "lng": 75.932023,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319641_75p931385",
+      "name": "n_11p319641_75p931385",
+      "lat": 11.319641,
+      "lng": 75.931385,
+      "type": "waypoint"
+    },
+    {
       "id": "n_11p319877_75p933445",
       "name": "n_11p319877_75p933445",
       "lat": 11.319877,
@@ -279,10 +342,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p321195_75p933738",
-      "name": "n_11p321195_75p933738",
+      "id": "n_11p321195_75p933739",
+      "name": "n_11p321195_75p933739",
       "lat": 11.321195,
-      "lng": 75.933738,
+      "lng": 75.933739,
       "type": "waypoint"
     },
     {
@@ -300,9 +363,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p321286_75p933852",
-      "name": "n_11p321286_75p933852",
-      "lat": 11.321286,
+      "id": "n_11p321287_75p933852",
+      "name": "n_11p321287_75p933852",
+      "lat": 11.321287,
       "lng": 75.933852,
       "type": "waypoint"
     },
@@ -419,9 +482,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p322454_75p935644",
-      "name": "n_11p322454_75p935644",
-      "lat": 11.322454,
+      "id": "n_11p322455_75p935644",
+      "name": "n_11p322455_75p935644",
+      "lat": 11.322455,
       "lng": 75.935644,
       "type": "waypoint"
     },
@@ -503,10 +566,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p322214_75p934390",
-      "name": "n_11p322214_75p934390",
+      "id": "n_11p322214_75p934391",
+      "name": "n_11p322214_75p934391",
       "lat": 11.322214,
-      "lng": 75.93439,
+      "lng": 75.934391,
       "type": "waypoint"
     },
     {
@@ -524,10 +587,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p321989_75p934616",
-      "name": "n_11p321989_75p934616",
+      "id": "n_11p321989_75p934617",
+      "name": "n_11p321989_75p934617",
       "lat": 11.321989,
-      "lng": 75.934616,
+      "lng": 75.934617,
       "type": "waypoint"
     },
     {
@@ -608,9 +671,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320394_75p934418",
-      "name": "n_11p320394_75p934418",
-      "lat": 11.320394,
+      "id": "n_11p320395_75p934418",
+      "name": "n_11p320395_75p934418",
+      "lat": 11.320395,
       "lng": 75.934418,
       "type": "waypoint"
     },
@@ -727,9 +790,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p321640_75p935003",
-      "name": "n_11p321640_75p935003",
-      "lat": 11.32164,
+      "id": "n_11p321641_75p935003",
+      "name": "n_11p321641_75p935003",
+      "lat": 11.321641,
       "lng": 75.935003,
       "type": "waypoint"
     },
@@ -783,9 +846,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p319960_75p936822",
-      "name": "n_11p319960_75p936822",
-      "lat": 11.31996,
+      "id": "n_11p319961_75p936822",
+      "name": "n_11p319961_75p936822",
+      "lat": 11.319961,
       "lng": 75.936822,
       "type": "waypoint"
     },
@@ -832,10 +895,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p319980_75p936496",
-      "name": "n_11p319980_75p936496",
+      "id": "n_11p319980_75p936497",
+      "name": "n_11p319980_75p936497",
       "lat": 11.31998,
-      "lng": 75.936496,
+      "lng": 75.936497,
       "type": "waypoint"
     },
     {
@@ -937,10 +1000,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320524_75p936796",
-      "name": "n_11p320524_75p936796",
+      "id": "n_11p320524_75p936797",
+      "name": "n_11p320524_75p936797",
       "lat": 11.320524,
-      "lng": 75.936796,
+      "lng": 75.936797,
       "type": "waypoint"
     },
     {
@@ -948,13 +1011,6 @@
       "name": "n_11p320499_75p936906",
       "lat": 11.320499,
       "lng": 75.936906,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p320426_75p937221",
-      "name": "n_11p320426_75p937221",
-      "lat": 11.320426,
-      "lng": 75.937221,
       "type": "waypoint"
     },
     {
@@ -1021,34 +1077,6 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320132_75p937242",
-      "name": "n_11p320132_75p937242",
-      "lat": 11.320132,
-      "lng": 75.937242,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319860_75p937235",
-      "name": "n_11p319860_75p937235",
-      "lat": 11.31986,
-      "lng": 75.937235,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319612_75p937224",
-      "name": "n_11p319612_75p937224",
-      "lat": 11.319612,
-      "lng": 75.937224,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319509_75p937204",
-      "name": "n_11p319509_75p937204",
-      "lat": 11.319509,
-      "lng": 75.937204,
-      "type": "waypoint"
-    },
-    {
       "id": "n_11p322848_75p936264",
       "name": "n_11p322848_75p936264",
       "lat": 11.322848,
@@ -1063,9 +1091,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p323256_75p936983",
-      "name": "n_11p323256_75p936983",
-      "lat": 11.323256,
+      "id": "n_11p323257_75p936983",
+      "name": "n_11p323257_75p936983",
+      "lat": 11.323257,
       "lng": 75.936983,
       "type": "waypoint"
     },
@@ -1098,10 +1126,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p317990_75p942050",
-      "name": "n_11p317990_75p942050",
-      "lat": 11.31799,
-      "lng": 75.94205,
+      "id": "n_11p317991_75p942051",
+      "name": "n_11p317991_75p942051",
+      "lat": 11.317991,
+      "lng": 75.942051,
       "type": "waypoint"
     },
     {
@@ -1140,10 +1168,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p325754_75p930314",
-      "name": "n_11p325754_75p930314",
+      "id": "n_11p325754_75p930315",
+      "name": "n_11p325754_75p930315",
       "lat": 11.325754,
-      "lng": 75.930314,
+      "lng": 75.930315,
       "type": "waypoint"
     },
     {
@@ -1357,9 +1385,9 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p330092_75p924218",
-      "name": "n_11p330092_75p924218",
-      "lat": 11.330092,
+      "id": "n_11p330093_75p924218",
+      "name": "n_11p330093_75p924218",
+      "lat": 11.330093,
       "lng": 75.924218,
       "type": "waypoint"
     },
@@ -1469,10 +1497,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p332293_75p928452",
-      "name": "n_11p332293_75p928452",
+      "id": "n_11p332293_75p928453",
+      "name": "n_11p332293_75p928453",
       "lat": 11.332293,
-      "lng": 75.928452,
+      "lng": 75.928453,
       "type": "waypoint"
     },
     {
@@ -1511,10 +1539,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p324922_75p930664",
-      "name": "n_11p324922_75p930664",
+      "id": "n_11p324922_75p930665",
+      "name": "n_11p324922_75p930665",
       "lat": 11.324922,
-      "lng": 75.930664,
+      "lng": 75.930665,
       "type": "waypoint"
     },
     {
@@ -1763,10 +1791,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p314202_75p932192",
-      "name": "n_11p314202_75p932192",
+      "id": "n_11p314202_75p932193",
+      "name": "n_11p314202_75p932193",
       "lat": 11.314202,
-      "lng": 75.932192,
+      "lng": 75.932193,
       "type": "waypoint"
     },
     {
@@ -1861,10 +1889,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320534_75p932868",
-      "name": "n_11p320534_75p932868",
+      "id": "n_11p320534_75p932869",
+      "name": "n_11p320534_75p932869",
       "lat": 11.320534,
-      "lng": 75.932868,
+      "lng": 75.932869,
       "type": "waypoint"
     },
     {
@@ -1917,10 +1945,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320088_75p932248",
-      "name": "n_11p320088_75p932248",
+      "id": "n_11p320088_75p932249",
+      "name": "n_11p320088_75p932249",
       "lat": 11.320088,
-      "lng": 75.932248,
+      "lng": 75.932249,
       "type": "waypoint"
     },
     {
@@ -1952,16 +1980,16 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p320998_75p935866",
-      "name": "n_11p320998_75p935866",
-      "lat": 11.320998,
+      "id": "n_11p320999_75p935866",
+      "name": "n_11p320999_75p935866",
+      "lat": 11.320999,
       "lng": 75.935866,
       "type": "waypoint"
     },
     {
-      "id": "n_11p320960_75p935874",
-      "name": "n_11p320960_75p935874",
-      "lat": 11.32096,
+      "id": "n_11p320961_75p935874",
+      "name": "n_11p320961_75p935874",
+      "lat": 11.320961,
       "lng": 75.935874,
       "type": "waypoint"
     },
@@ -2022,10 +2050,10 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p322423_75p936476",
-      "name": "n_11p322423_75p936476",
+      "id": "n_11p322423_75p936477",
+      "name": "n_11p322423_75p936477",
       "lat": 11.322423,
-      "lng": 75.936476,
+      "lng": 75.936477,
       "type": "waypoint"
     },
     {
@@ -2036,16 +2064,16 @@
       "type": "waypoint"
     },
     {
-      "id": "n_11p322071_75p936670",
-      "name": "n_11p322071_75p936670",
+      "id": "n_11p322071_75p936671",
+      "name": "n_11p322071_75p936671",
       "lat": 11.322071,
-      "lng": 75.93667,
+      "lng": 75.936671,
       "type": "waypoint"
     },
     {
-      "id": "n_11p321966_75p936749",
-      "name": "n_11p321966_75p936749",
-      "lat": 11.321966,
+      "id": "n_11p321967_75p936749",
+      "name": "n_11p321967_75p936749",
+      "lat": 11.321967,
       "lng": 75.936749,
       "type": "waypoint"
     },
@@ -2075,34 +2103,6 @@
       "name": "n_11p322810_75p934273",
       "lat": 11.32281,
       "lng": 75.934273,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319871_75p933444",
-      "name": "n_11p319871_75p933444",
-      "lat": 11.319871,
-      "lng": 75.933444,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319932_75p932562",
-      "name": "n_11p319932_75p932562",
-      "lat": 11.319932,
-      "lng": 75.932562,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319803_75p932023",
-      "name": "n_11p319803_75p932023",
-      "lat": 11.319803,
-      "lng": 75.932023,
-      "type": "waypoint"
-    },
-    {
-      "id": "n_11p319641_75p931385",
-      "name": "n_11p319641_75p931385",
-      "lat": 11.319641,
-      "lng": 75.931385,
       "type": "waypoint"
     },
     {
@@ -2195,9 +2195,443 @@
       "lat": 11.319694,
       "lng": 75.934553,
       "type": "waypoint"
+    },
+    {
+      "id": "n_11p319641_75p931386",
+      "name": "n_11p319641_75p931386",
+      "lat": 11.319641,
+      "lng": 75.931386,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319546_75p931112",
+      "name": "n_11p319546_75p931112",
+      "lat": 11.319546,
+      "lng": 75.931112,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319532_75p930684",
+      "name": "n_11p319532_75p930684",
+      "lat": 11.319532,
+      "lng": 75.930684,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319555_75p930572",
+      "name": "n_11p319555_75p930572",
+      "lat": 11.319555,
+      "lng": 75.930572,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319823_75p932095",
+      "name": "n_11p319823_75p932095",
+      "lat": 11.319823,
+      "lng": 75.932095,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319751_75p932134",
+      "name": "n_11p319751_75p932134",
+      "lat": 11.319751,
+      "lng": 75.932134,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319703_75p932153",
+      "name": "n_11p319703_75p932153",
+      "lat": 11.319703,
+      "lng": 75.932153,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319279_75p932110",
+      "name": "n_11p319279_75p932110",
+      "lat": 11.319279,
+      "lng": 75.93211,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318644_75p930830",
+      "name": "n_11p318644_75p930830",
+      "lat": 11.318644,
+      "lng": 75.93083,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318363_75p930962",
+      "name": "n_11p318363_75p930962",
+      "lat": 11.318363,
+      "lng": 75.930962,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318146_75p931092",
+      "name": "n_11p318146_75p931092",
+      "lat": 11.318146,
+      "lng": 75.931092,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318144_75p931093",
+      "name": "n_11p318144_75p931093",
+      "lat": 11.318144,
+      "lng": 75.931093,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318075_75p931047",
+      "name": "n_11p318075_75p931047",
+      "lat": 11.318075,
+      "lng": 75.931047,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318040_75p931020",
+      "name": "n_11p318040_75p931020",
+      "lat": 11.31804,
+      "lng": 75.93102,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p317953_75p931020",
+      "name": "n_11p317953_75p931020",
+      "lat": 11.317953,
+      "lng": 75.93102,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p317739_75p931168",
+      "name": "n_11p317739_75p931168",
+      "lat": 11.317739,
+      "lng": 75.931168,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318142_75p931092",
+      "name": "n_11p318142_75p931092",
+      "lat": 11.318142,
+      "lng": 75.931092,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318147_75p931091",
+      "name": "n_11p318147_75p931091",
+      "lat": 11.318147,
+      "lng": 75.931091,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318143_75p931092",
+      "name": "n_11p318143_75p931092",
+      "lat": 11.318143,
+      "lng": 75.931092,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319264_75p932089",
+      "name": "n_11p319264_75p932089",
+      "lat": 11.319264,
+      "lng": 75.932089,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319015_75p932082",
+      "name": "n_11p319015_75p932082",
+      "lat": 11.319015,
+      "lng": 75.932082,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319087_75p932470",
+      "name": "n_11p319087_75p932470",
+      "lat": 11.319087,
+      "lng": 75.93247,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319106_75p933070",
+      "name": "n_11p319106_75p933070",
+      "lat": 11.319106,
+      "lng": 75.93307,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319192_75p933291",
+      "name": "n_11p319192_75p933291",
+      "lat": 11.319192,
+      "lng": 75.933291,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319192_75p933377",
+      "name": "n_11p319192_75p933377",
+      "lat": 11.319192,
+      "lng": 75.933377,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319034_75p932069",
+      "name": "n_11p319034_75p932069",
+      "lat": 11.319034,
+      "lng": 75.932069,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318557_75p932136",
+      "name": "n_11p318557_75p932136",
+      "lat": 11.318557,
+      "lng": 75.932136,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318478_75p932203",
+      "name": "n_11p318478_75p932203",
+      "lat": 11.318478,
+      "lng": 75.932203,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318354_75p930974",
+      "name": "n_11p318354_75p930974",
+      "lat": 11.318354,
+      "lng": 75.930974,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318478_75p932196",
+      "name": "n_11p318478_75p932196",
+      "lat": 11.318478,
+      "lng": 75.932196,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p318635_75p933411",
+      "name": "n_11p318635_75p933411",
+      "lat": 11.318635,
+      "lng": 75.933411,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319195_75p933361",
+      "name": "n_11p319195_75p933361",
+      "lat": 11.319195,
+      "lng": 75.933361,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319188_75p933391",
+      "name": "n_11p319188_75p933391",
+      "lat": 11.319188,
+      "lng": 75.933391,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319031_75p932070",
+      "name": "n_11p319031_75p932070",
+      "lat": 11.319031,
+      "lng": 75.93207,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319038_75p932086",
+      "name": "n_11p319038_75p932086",
+      "lat": 11.319038,
+      "lng": 75.932086,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319508_75p937203",
+      "name": "n_11p319508_75p937203",
+      "lat": 11.319508,
+      "lng": 75.937203,
+      "type": "waypoint"
+    },
+    {
+      "id": "n_11p319511_75p937204",
+      "name": "n_11p319511_75p937204",
+      "lat": 11.319511,
+      "lng": 75.937204,
+      "type": "waypoint"
+    },
+    {
+      "id": "stop_s1",
+      "name": "Stop 1",
+      "lat": 11.320166,
+      "lng": 75.931754,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s2",
+      "name": "CENTER CIRCLE",
+      "lat": 11.3215,
+      "lng": 75.934167,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s3",
+      "name": "DEPARTMENT BUILDING",
+      "lat": 11.321639,
+      "lng": 75.935028,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s4",
+      "name": "ARCHITECTURE NODE",
+      "lat": 11.322944,
+      "lng": 75.936444,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s5",
+      "name": "LH",
+      "lat": 11.318333,
+      "lng": 75.931028,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s7",
+      "name": "SOMS",
+      "lat": 11.314111,
+      "lng": 75.932,
+      "type": "bus_stop"
+    },
+    {
+      "id": "stop_s8",
+      "name": "ECLCHC",
+      "lat": 11.323056,
+      "lng": 75.937278,
+      "type": "bus_stop"
     }
   ],
   "edges": [
+    {
+      "from": "n_11p320426_75p937221",
+      "to": "n_11p320132_75p937242",
+      "distance": 33,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p320132_75p937242",
+      "to": "n_11p320426_75p937221",
+      "distance": 33,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p320132_75p937242",
+      "to": "n_11p319860_75p937235",
+      "distance": 30,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319860_75p937235",
+      "to": "n_11p320132_75p937242",
+      "distance": 30,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319860_75p937235",
+      "to": "n_11p319613_75p937224",
+      "distance": 27,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319613_75p937224",
+      "to": "n_11p319860_75p937235",
+      "distance": 27,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319613_75p937224",
+      "to": "n_11p319509_75p937204",
+      "distance": 12,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319509_75p937204",
+      "to": "n_11p319613_75p937224",
+      "distance": 12,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319871_75p933444",
+      "to": "n_11p319932_75p932562",
+      "distance": 96,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319932_75p932562",
+      "to": "n_11p319871_75p933444",
+      "distance": 96,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319932_75p932562",
+      "to": "n_11p319803_75p932023",
+      "distance": 60,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319803_75p932023",
+      "to": "n_11p319932_75p932562",
+      "distance": 60,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319803_75p932023",
+      "to": "n_11p319641_75p931385",
+      "distance": 72,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319641_75p931385",
+      "to": "n_11p319803_75p932023",
+      "distance": 72,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
     {
       "from": "n_11p319877_75p933445",
       "to": "n_11p319184_75p933390",
@@ -2848,7 +3282,7 @@
     },
     {
       "from": "n_11p321144_75p933675",
-      "to": "n_11p321195_75p933738",
+      "to": "n_11p321195_75p933739",
       "distance": 9,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -2856,7 +3290,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321195_75p933738",
+      "from": "n_11p321195_75p933739",
       "to": "n_11p321144_75p933675",
       "distance": 9,
       "slopePenalty": 0,
@@ -2865,7 +3299,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321195_75p933738",
+      "from": "n_11p321195_75p933739",
       "to": "n_11p321223_75p933773",
       "distance": 5,
       "slopePenalty": 0,
@@ -2875,7 +3309,7 @@
     },
     {
       "from": "n_11p321223_75p933773",
-      "to": "n_11p321195_75p933738",
+      "to": "n_11p321195_75p933739",
       "distance": 5,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -2902,7 +3336,7 @@
     },
     {
       "from": "n_11p321252_75p933810",
-      "to": "n_11p321286_75p933852",
+      "to": "n_11p321287_75p933852",
       "distance": 6,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -2910,7 +3344,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321286_75p933852",
+      "from": "n_11p321287_75p933852",
       "to": "n_11p321252_75p933810",
       "distance": 6,
       "slopePenalty": 0,
@@ -2919,7 +3353,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321286_75p933852",
+      "from": "n_11p321287_75p933852",
       "to": "n_11p321310_75p933878",
       "distance": 4,
       "slopePenalty": 0,
@@ -2929,7 +3363,7 @@
     },
     {
       "from": "n_11p321310_75p933878",
-      "to": "n_11p321286_75p933852",
+      "to": "n_11p321287_75p933852",
       "distance": 4,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3190,7 +3624,7 @@
     },
     {
       "from": "n_11p322591_75p935787",
-      "to": "n_11p322454_75p935644",
+      "to": "n_11p322455_75p935644",
       "distance": 22,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3198,7 +3632,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322454_75p935644",
+      "from": "n_11p322455_75p935644",
       "to": "n_11p322591_75p935787",
       "distance": 22,
       "slopePenalty": 0,
@@ -3207,7 +3641,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322454_75p935644",
+      "from": "n_11p322455_75p935644",
       "to": "n_11p322363_75p935558",
       "distance": 14,
       "slopePenalty": 0,
@@ -3217,7 +3651,7 @@
     },
     {
       "from": "n_11p322363_75p935558",
-      "to": "n_11p322454_75p935644",
+      "to": "n_11p322455_75p935644",
       "distance": 14,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3406,7 +3840,7 @@
     },
     {
       "from": "n_11p322280_75p934324",
-      "to": "n_11p322214_75p934390",
+      "to": "n_11p322214_75p934391",
       "distance": 10,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3414,7 +3848,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322214_75p934390",
+      "from": "n_11p322214_75p934391",
       "to": "n_11p322280_75p934324",
       "distance": 10,
       "slopePenalty": 0,
@@ -3423,7 +3857,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322214_75p934390",
+      "from": "n_11p322214_75p934391",
       "to": "n_11p322139_75p934461",
       "distance": 11,
       "slopePenalty": 0,
@@ -3433,7 +3867,7 @@
     },
     {
       "from": "n_11p322139_75p934461",
-      "to": "n_11p322214_75p934390",
+      "to": "n_11p322214_75p934391",
       "distance": 11,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3460,7 +3894,7 @@
     },
     {
       "from": "n_11p322108_75p934491",
-      "to": "n_11p321989_75p934616",
+      "to": "n_11p321989_75p934617",
       "distance": 19,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3468,7 +3902,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321989_75p934616",
+      "from": "n_11p321989_75p934617",
       "to": "n_11p322108_75p934491",
       "distance": 19,
       "slopePenalty": 0,
@@ -3477,7 +3911,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321989_75p934616",
+      "from": "n_11p321989_75p934617",
       "to": "n_11p321923_75p934686",
       "distance": 11,
       "slopePenalty": 0,
@@ -3487,7 +3921,7 @@
     },
     {
       "from": "n_11p321923_75p934686",
-      "to": "n_11p321989_75p934616",
+      "to": "n_11p321989_75p934617",
       "distance": 11,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -3640,24 +4074,24 @@
     },
     {
       "from": "n_11p320423_75p934186",
-      "to": "n_11p320394_75p934418",
-      "distance": 26,
+      "to": "n_11p320395_75p934418",
+      "distance": 25,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320394_75p934418",
+      "from": "n_11p320395_75p934418",
       "to": "n_11p320423_75p934186",
-      "distance": 26,
+      "distance": 25,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320394_75p934418",
+      "from": "n_11p320395_75p934418",
       "to": "n_11p320390_75p934502",
       "distance": 9,
       "slopePenalty": 0,
@@ -3667,7 +4101,7 @@
     },
     {
       "from": "n_11p320390_75p934502",
-      "to": "n_11p320394_75p934418",
+      "to": "n_11p320395_75p934418",
       "distance": 9,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4018,24 +4452,24 @@
     },
     {
       "from": "n_11p321671_75p935030",
-      "to": "n_11p321640_75p935003",
-      "distance": 5,
+      "to": "n_11p321641_75p935003",
+      "distance": 4,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321640_75p935003",
+      "from": "n_11p321641_75p935003",
       "to": "n_11p321671_75p935030",
-      "distance": 5,
+      "distance": 4,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321640_75p935003",
+      "from": "n_11p321641_75p935003",
       "to": "n_11p321463_75p934844",
       "distance": 26,
       "slopePenalty": 0,
@@ -4045,7 +4479,7 @@
     },
     {
       "from": "n_11p321463_75p934844",
-      "to": "n_11p321640_75p935003",
+      "to": "n_11p321641_75p935003",
       "distance": 26,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4072,7 +4506,7 @@
     },
     {
       "from": "n_11p321793_75p934834",
-      "to": "n_11p321640_75p935003",
+      "to": "n_11p321641_75p935003",
       "distance": 25,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4080,7 +4514,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321640_75p935003",
+      "from": "n_11p321641_75p935003",
       "to": "n_11p321793_75p934834",
       "distance": 25,
       "slopePenalty": 0,
@@ -4198,7 +4632,7 @@
     },
     {
       "from": "n_11p320012_75p936817",
-      "to": "n_11p319960_75p936822",
+      "to": "n_11p319961_75p936822",
       "distance": 6,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4206,7 +4640,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p319960_75p936822",
+      "from": "n_11p319961_75p936822",
       "to": "n_11p320012_75p936817",
       "distance": 6,
       "slopePenalty": 0,
@@ -4215,7 +4649,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p319960_75p936822",
+      "from": "n_11p319961_75p936822",
       "to": "n_11p319973_75p936951",
       "distance": 14,
       "slopePenalty": 0,
@@ -4225,7 +4659,7 @@
     },
     {
       "from": "n_11p319973_75p936951",
-      "to": "n_11p319960_75p936822",
+      "to": "n_11p319961_75p936822",
       "distance": 14,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4324,7 +4758,7 @@
     },
     {
       "from": "n_11p320007_75p936768",
-      "to": "n_11p319980_75p936496",
+      "to": "n_11p319980_75p936497",
       "distance": 30,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4332,7 +4766,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p319980_75p936496",
+      "from": "n_11p319980_75p936497",
       "to": "n_11p320007_75p936768",
       "distance": 30,
       "slopePenalty": 0,
@@ -4341,7 +4775,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p319980_75p936496",
+      "from": "n_11p319980_75p936497",
       "to": "n_11p319771_75p936518",
       "distance": 23,
       "slopePenalty": 0,
@@ -4351,7 +4785,7 @@
     },
     {
       "from": "n_11p319771_75p936518",
-      "to": "n_11p319980_75p936496",
+      "to": "n_11p319980_75p936497",
       "distance": 23,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4612,7 +5046,7 @@
     },
     {
       "from": "n_11p320572_75p936591",
-      "to": "n_11p320524_75p936796",
+      "to": "n_11p320524_75p936797",
       "distance": 23,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4620,7 +5054,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320524_75p936796",
+      "from": "n_11p320524_75p936797",
       "to": "n_11p320572_75p936591",
       "distance": 23,
       "slopePenalty": 0,
@@ -4629,7 +5063,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320524_75p936796",
+      "from": "n_11p320524_75p936797",
       "to": "n_11p320499_75p936906",
       "distance": 12,
       "slopePenalty": 0,
@@ -4639,7 +5073,7 @@
     },
     {
       "from": "n_11p320499_75p936906",
-      "to": "n_11p320524_75p936796",
+      "to": "n_11p320524_75p936797",
       "distance": 12,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4827,78 +5261,6 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320426_75p937221",
-      "to": "n_11p320132_75p937242",
-      "distance": 33,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p320132_75p937242",
-      "to": "n_11p320426_75p937221",
-      "distance": 33,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p320132_75p937242",
-      "to": "n_11p319860_75p937235",
-      "distance": 30,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319860_75p937235",
-      "to": "n_11p320132_75p937242",
-      "distance": 30,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319860_75p937235",
-      "to": "n_11p319612_75p937224",
-      "distance": 28,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319612_75p937224",
-      "to": "n_11p319860_75p937235",
-      "distance": 28,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319612_75p937224",
-      "to": "n_11p319509_75p937204",
-      "distance": 12,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319509_75p937204",
-      "to": "n_11p319612_75p937224",
-      "distance": 12,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
       "from": "n_11p322848_75p936264",
       "to": "n_11p322948_75p936461",
       "distance": 24,
@@ -4918,7 +5280,7 @@
     },
     {
       "from": "n_11p322948_75p936461",
-      "to": "n_11p323256_75p936983",
+      "to": "n_11p323257_75p936983",
       "distance": 66,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -4926,7 +5288,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p323256_75p936983",
+      "from": "n_11p323257_75p936983",
       "to": "n_11p322948_75p936461",
       "distance": 66,
       "slopePenalty": 0,
@@ -5008,7 +5370,7 @@
     },
     {
       "from": "n_11p318206_75p942159",
-      "to": "n_11p317990_75p942050",
+      "to": "n_11p317991_75p942051",
       "distance": 27,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5016,7 +5378,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p317990_75p942050",
+      "from": "n_11p317991_75p942051",
       "to": "n_11p318206_75p942159",
       "distance": 27,
       "slopePenalty": 0,
@@ -5025,7 +5387,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p317990_75p942050",
+      "from": "n_11p317991_75p942051",
       "to": "n_11p317886_75p941870",
       "distance": 23,
       "slopePenalty": 0,
@@ -5035,7 +5397,7 @@
     },
     {
       "from": "n_11p317886_75p941870",
-      "to": "n_11p317990_75p942050",
+      "to": "n_11p317991_75p942051",
       "distance": 23,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5098,7 +5460,7 @@
     },
     {
       "from": "n_11p325647_75p930234",
-      "to": "n_11p325754_75p930314",
+      "to": "n_11p325754_75p930315",
       "distance": 15,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5106,7 +5468,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p325754_75p930314",
+      "from": "n_11p325754_75p930315",
       "to": "n_11p325647_75p930234",
       "distance": 15,
       "slopePenalty": 0,
@@ -5115,7 +5477,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p325754_75p930314",
+      "from": "n_11p325754_75p930315",
       "to": "n_11p325420_75p930769",
       "distance": 62,
       "slopePenalty": 0,
@@ -5125,7 +5487,7 @@
     },
     {
       "from": "n_11p325420_75p930769",
-      "to": "n_11p325754_75p930314",
+      "to": "n_11p325754_75p930315",
       "distance": 62,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5620,7 +5982,7 @@
     },
     {
       "from": "n_11p329837_75p924175",
-      "to": "n_11p330092_75p924218",
+      "to": "n_11p330093_75p924218",
       "distance": 29,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5628,7 +5990,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p330092_75p924218",
+      "from": "n_11p330093_75p924218",
       "to": "n_11p329837_75p924175",
       "distance": 29,
       "slopePenalty": 0,
@@ -5637,7 +5999,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p330092_75p924218",
+      "from": "n_11p330093_75p924218",
       "to": "n_11p330414_75p924364",
       "distance": 39,
       "slopePenalty": 0,
@@ -5647,7 +6009,7 @@
     },
     {
       "from": "n_11p330414_75p924364",
-      "to": "n_11p330092_75p924218",
+      "to": "n_11p330093_75p924218",
       "distance": 39,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5854,7 +6216,7 @@
     },
     {
       "from": "n_11p332307_75p928244",
-      "to": "n_11p332293_75p928452",
+      "to": "n_11p332293_75p928453",
       "distance": 23,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5862,7 +6224,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p332293_75p928452",
+      "from": "n_11p332293_75p928453",
       "to": "n_11p332307_75p928244",
       "distance": 23,
       "slopePenalty": 0,
@@ -5871,7 +6233,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p332293_75p928452",
+      "from": "n_11p332293_75p928453",
       "to": "n_11p332312_75p928835",
       "distance": 42,
       "slopePenalty": 0,
@@ -5881,7 +6243,7 @@
     },
     {
       "from": "n_11p332312_75p928835",
-      "to": "n_11p332293_75p928452",
+      "to": "n_11p332293_75p928453",
       "distance": 42,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5962,7 +6324,7 @@
     },
     {
       "from": "n_11p324867_75p930936",
-      "to": "n_11p324922_75p930664",
+      "to": "n_11p324922_75p930665",
       "distance": 30,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -5970,7 +6332,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p324922_75p930664",
+      "from": "n_11p324922_75p930665",
       "to": "n_11p324867_75p930936",
       "distance": 30,
       "slopePenalty": 0,
@@ -5979,7 +6341,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p324922_75p930664",
+      "from": "n_11p324922_75p930665",
       "to": "n_11p324871_75p930526",
       "distance": 16,
       "slopePenalty": 0,
@@ -5989,7 +6351,7 @@
     },
     {
       "from": "n_11p324871_75p930526",
-      "to": "n_11p324922_75p930664",
+      "to": "n_11p324922_75p930665",
       "distance": 16,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -6646,7 +7008,7 @@
     },
     {
       "from": "n_11p313868_75p932168",
-      "to": "n_11p314202_75p932192",
+      "to": "n_11p314202_75p932193",
       "distance": 37,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -6654,7 +7016,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p314202_75p932192",
+      "from": "n_11p314202_75p932193",
       "to": "n_11p313868_75p932168",
       "distance": 37,
       "slopePenalty": 0,
@@ -6861,7 +7223,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320524_75p936796",
+      "from": "n_11p320524_75p936797",
       "to": "n_11p320769_75p936825",
       "distance": 27,
       "slopePenalty": 0,
@@ -6871,7 +7233,7 @@
     },
     {
       "from": "n_11p320769_75p936825",
-      "to": "n_11p320524_75p936796",
+      "to": "n_11p320524_75p936797",
       "distance": 27,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -6916,7 +7278,7 @@
     },
     {
       "from": "n_11p320491_75p932929",
-      "to": "n_11p320534_75p932868",
+      "to": "n_11p320534_75p932869",
       "distance": 8,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -6924,7 +7286,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320534_75p932868",
+      "from": "n_11p320534_75p932869",
       "to": "n_11p320491_75p932929",
       "distance": 8,
       "slopePenalty": 0,
@@ -6933,7 +7295,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320534_75p932868",
+      "from": "n_11p320534_75p932869",
       "to": "n_11p320634_75p932725",
       "distance": 19,
       "slopePenalty": 0,
@@ -6943,7 +7305,7 @@
     },
     {
       "from": "n_11p320634_75p932725",
-      "to": "n_11p320534_75p932868",
+      "to": "n_11p320534_75p932869",
       "distance": 19,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7005,7 +7367,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320534_75p932868",
+      "from": "n_11p320534_75p932869",
       "to": "n_11p320816_75p933095",
       "distance": 40,
       "slopePenalty": 0,
@@ -7015,7 +7377,7 @@
     },
     {
       "from": "n_11p320816_75p933095",
-      "to": "n_11p320534_75p932868",
+      "to": "n_11p320534_75p932869",
       "distance": 40,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7060,7 +7422,7 @@
     },
     {
       "from": "n_11p319911_75p932021",
-      "to": "n_11p320088_75p932248",
+      "to": "n_11p320088_75p932249",
       "distance": 32,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7068,7 +7430,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320088_75p932248",
+      "from": "n_11p320088_75p932249",
       "to": "n_11p319911_75p932021",
       "distance": 32,
       "slopePenalty": 0,
@@ -7077,7 +7439,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320088_75p932248",
+      "from": "n_11p320088_75p932249",
       "to": "n_11p320168_75p932252",
       "distance": 9,
       "slopePenalty": 0,
@@ -7087,7 +7449,7 @@
     },
     {
       "from": "n_11p320168_75p932252",
-      "to": "n_11p320088_75p932248",
+      "to": "n_11p320088_75p932249",
       "distance": 9,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7095,7 +7457,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320088_75p932248",
+      "from": "n_11p320088_75p932249",
       "to": "n_11p320078_75p932402",
       "distance": 17,
       "slopePenalty": 0,
@@ -7105,7 +7467,7 @@
     },
     {
       "from": "n_11p320078_75p932402",
-      "to": "n_11p320088_75p932248",
+      "to": "n_11p320088_75p932249",
       "distance": 17,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7168,25 +7530,25 @@
     },
     {
       "from": "n_11p321065_75p935828",
-      "to": "n_11p320998_75p935866",
-      "distance": 9,
+      "to": "n_11p320999_75p935866",
+      "distance": 8,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320998_75p935866",
+      "from": "n_11p320999_75p935866",
       "to": "n_11p321065_75p935828",
-      "distance": 9,
+      "distance": 8,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320998_75p935866",
-      "to": "n_11p320960_75p935874",
+      "from": "n_11p320999_75p935866",
+      "to": "n_11p320961_75p935874",
       "distance": 4,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7194,8 +7556,8 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320960_75p935874",
-      "to": "n_11p320998_75p935866",
+      "from": "n_11p320961_75p935874",
+      "to": "n_11p320999_75p935866",
       "distance": 4,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7203,7 +7565,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p320960_75p935874",
+      "from": "n_11p320961_75p935874",
       "to": "n_11p320922_75p935853",
       "distance": 5,
       "slopePenalty": 0,
@@ -7213,7 +7575,7 @@
     },
     {
       "from": "n_11p320922_75p935853",
-      "to": "n_11p320960_75p935874",
+      "to": "n_11p320961_75p935874",
       "distance": 5,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7384,7 +7746,7 @@
     },
     {
       "from": "n_11p322626_75p936316",
-      "to": "n_11p322423_75p936476",
+      "to": "n_11p322423_75p936477",
       "distance": 29,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7392,7 +7754,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322423_75p936476",
+      "from": "n_11p322423_75p936477",
       "to": "n_11p322626_75p936316",
       "distance": 29,
       "slopePenalty": 0,
@@ -7401,7 +7763,7 @@
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322423_75p936476",
+      "from": "n_11p322423_75p936477",
       "to": "n_11p322203_75p936567",
       "distance": 26,
       "slopePenalty": 0,
@@ -7411,7 +7773,7 @@
     },
     {
       "from": "n_11p322203_75p936567",
-      "to": "n_11p322423_75p936476",
+      "to": "n_11p322423_75p936477",
       "distance": 26,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7420,42 +7782,42 @@
     },
     {
       "from": "n_11p322203_75p936567",
-      "to": "n_11p322071_75p936670",
-      "distance": 18,
+      "to": "n_11p322071_75p936671",
+      "distance": 19,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322071_75p936670",
+      "from": "n_11p322071_75p936671",
       "to": "n_11p322203_75p936567",
-      "distance": 18,
+      "distance": 19,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p322071_75p936670",
-      "to": "n_11p321966_75p936749",
-      "distance": 15,
+      "from": "n_11p322071_75p936671",
+      "to": "n_11p321967_75p936749",
+      "distance": 14,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321966_75p936749",
-      "to": "n_11p322071_75p936670",
-      "distance": 15,
+      "from": "n_11p321967_75p936749",
+      "to": "n_11p322071_75p936671",
+      "distance": 14,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
       "shadedPreference": 0
     },
     {
-      "from": "n_11p321966_75p936749",
+      "from": "n_11p321967_75p936749",
       "to": "n_11p321719_75p936732",
       "distance": 28,
       "slopePenalty": 0,
@@ -7465,7 +7827,7 @@
     },
     {
       "from": "n_11p321719_75p936732",
-      "to": "n_11p321966_75p936749",
+      "to": "n_11p321967_75p936749",
       "distance": 28,
       "slopePenalty": 0,
       "stairsPenalty": 0,
@@ -7557,60 +7919,6 @@
       "from": "n_11p322807_75p934391",
       "to": "n_11p322810_75p934273",
       "distance": 13,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319871_75p933444",
-      "to": "n_11p319932_75p932562",
-      "distance": 96,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319932_75p932562",
-      "to": "n_11p319871_75p933444",
-      "distance": 96,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319932_75p932562",
-      "to": "n_11p319803_75p932023",
-      "distance": 60,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319803_75p932023",
-      "to": "n_11p319932_75p932562",
-      "distance": 60,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319803_75p932023",
-      "to": "n_11p319641_75p931385",
-      "distance": 72,
-      "slopePenalty": 0,
-      "stairsPenalty": 0,
-      "accessibilityCost": 0,
-      "shadedPreference": 0
-    },
-    {
-      "from": "n_11p319641_75p931385",
-      "to": "n_11p319803_75p932023",
-      "distance": 72,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
@@ -7791,6 +8099,618 @@
       "from": "n_11p319694_75p934553",
       "to": "n_11p319757_75p934543",
       "distance": 7,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319641_75p931386",
+      "to": "n_11p319546_75p931112",
+      "distance": 32,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319546_75p931112",
+      "to": "n_11p319641_75p931386",
+      "distance": 32,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319546_75p931112",
+      "to": "n_11p319532_75p930684",
+      "distance": 47,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319532_75p930684",
+      "to": "n_11p319546_75p931112",
+      "distance": 47,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319532_75p930684",
+      "to": "n_11p319555_75p930572",
+      "distance": 12,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319555_75p930572",
+      "to": "n_11p319532_75p930684",
+      "distance": 12,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319823_75p932095",
+      "to": "n_11p319751_75p932134",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319751_75p932134",
+      "to": "n_11p319823_75p932095",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319751_75p932134",
+      "to": "n_11p319703_75p932153",
+      "distance": 6,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319703_75p932153",
+      "to": "n_11p319751_75p932134",
+      "distance": 6,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319703_75p932153",
+      "to": "n_11p319279_75p932110",
+      "distance": 47,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319279_75p932110",
+      "to": "n_11p319703_75p932153",
+      "distance": 47,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319279_75p932110",
+      "to": "n_11p318644_75p930830",
+      "distance": 156,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318644_75p930830",
+      "to": "n_11p319279_75p932110",
+      "distance": 156,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318644_75p930830",
+      "to": "n_11p318363_75p930962",
+      "distance": 34,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318363_75p930962",
+      "to": "n_11p318644_75p930830",
+      "distance": 34,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318363_75p930962",
+      "to": "n_11p318146_75p931092",
+      "distance": 28,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318146_75p931092",
+      "to": "n_11p318363_75p930962",
+      "distance": 28,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318144_75p931093",
+      "to": "n_11p318075_75p931047",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318075_75p931047",
+      "to": "n_11p318144_75p931093",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318075_75p931047",
+      "to": "n_11p318040_75p931020",
+      "distance": 5,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318040_75p931020",
+      "to": "n_11p318075_75p931047",
+      "distance": 5,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318040_75p931020",
+      "to": "n_11p317953_75p931020",
+      "distance": 10,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p317953_75p931020",
+      "to": "n_11p318040_75p931020",
+      "distance": 10,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p317953_75p931020",
+      "to": "n_11p317739_75p931168",
+      "distance": 29,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p317739_75p931168",
+      "to": "n_11p317953_75p931020",
+      "distance": 29,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318142_75p931092",
+      "to": "n_11p318147_75p931091",
+      "distance": 1,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318147_75p931091",
+      "to": "n_11p318142_75p931092",
+      "distance": 1,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318147_75p931091",
+      "to": "n_11p318143_75p931092",
+      "distance": 0,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318143_75p931092",
+      "to": "n_11p318147_75p931091",
+      "distance": 0,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319264_75p932089",
+      "to": "n_11p319015_75p932082",
+      "distance": 28,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319015_75p932082",
+      "to": "n_11p319264_75p932089",
+      "distance": 28,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319015_75p932082",
+      "to": "n_11p319087_75p932470",
+      "distance": 43,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319087_75p932470",
+      "to": "n_11p319015_75p932082",
+      "distance": 43,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319087_75p932470",
+      "to": "n_11p319106_75p933070",
+      "distance": 65,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319106_75p933070",
+      "to": "n_11p319087_75p932470",
+      "distance": 65,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319106_75p933070",
+      "to": "n_11p319192_75p933291",
+      "distance": 26,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319192_75p933291",
+      "to": "n_11p319106_75p933070",
+      "distance": 26,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319192_75p933291",
+      "to": "n_11p319192_75p933377",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319192_75p933377",
+      "to": "n_11p319192_75p933291",
+      "distance": 9,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319034_75p932069",
+      "to": "n_11p318557_75p932136",
+      "distance": 54,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318557_75p932136",
+      "to": "n_11p319034_75p932069",
+      "distance": 54,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318557_75p932136",
+      "to": "n_11p318478_75p932203",
+      "distance": 11,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318478_75p932203",
+      "to": "n_11p318557_75p932136",
+      "distance": 11,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318478_75p932203",
+      "to": "n_11p318354_75p930974",
+      "distance": 135,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318354_75p930974",
+      "to": "n_11p318478_75p932203",
+      "distance": 135,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318478_75p932196",
+      "to": "n_11p318635_75p933411",
+      "distance": 134,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318635_75p933411",
+      "to": "n_11p318478_75p932196",
+      "distance": 134,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319195_75p933361",
+      "to": "n_11p319188_75p933391",
+      "distance": 3,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319188_75p933391",
+      "to": "n_11p319195_75p933361",
+      "distance": 3,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319031_75p932070",
+      "to": "n_11p319038_75p932086",
+      "distance": 2,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319038_75p932086",
+      "to": "n_11p319031_75p932070",
+      "distance": 2,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319508_75p937203",
+      "to": "n_11p319511_75p937204",
+      "distance": 0,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319511_75p937204",
+      "to": "n_11p319508_75p937203",
+      "distance": 0,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s1",
+      "to": "n_11p319911_75p932021",
+      "distance": 41,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p319911_75p932021",
+      "to": "stop_s1",
+      "distance": 41,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s2",
+      "to": "n_11p321490_75p934096",
+      "distance": 8,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p321490_75p934096",
+      "to": "stop_s2",
+      "distance": 8,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s3",
+      "to": "n_11p321641_75p935003",
+      "distance": 3,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p321641_75p935003",
+      "to": "stop_s3",
+      "distance": 3,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s4",
+      "to": "n_11p322948_75p936461",
+      "distance": 2,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p322948_75p936461",
+      "to": "stop_s4",
+      "distance": 2,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s5",
+      "to": "n_11p318354_75p930974",
+      "distance": 6,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p318354_75p930974",
+      "to": "stop_s5",
+      "distance": 6,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s7",
+      "to": "n_11p314202_75p932193",
+      "distance": 23,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p314202_75p932193",
+      "to": "stop_s7",
+      "distance": 23,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "stop_s8",
+      "to": "n_11p323188_75p937209",
+      "distance": 17,
+      "slopePenalty": 0,
+      "stairsPenalty": 0,
+      "accessibilityCost": 0,
+      "shadedPreference": 0
+    },
+    {
+      "from": "n_11p323188_75p937209",
+      "to": "stop_s8",
+      "distance": 17,
       "slopePenalty": 0,
       "stairsPenalty": 0,
       "accessibilityCost": 0,
