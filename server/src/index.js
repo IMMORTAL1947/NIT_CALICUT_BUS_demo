@@ -305,8 +305,11 @@ app.get('/api/colleges/:code/route-to-stop', async (req, res) => {
       const stopMeta = (college.stops || []).find(s => String(s.id) === String(stopId));
       if (stopMeta) { stopLat = Number(stopMeta.lat); stopLng = Number(stopMeta.lng); }
     } catch {}
-    const effectiveUserLat = Number(userLat);
-    const effectiveUserLng = Number(userLng);
+    // Temporary override: when using Dijkstra, force a fixed origin point
+    const algoLower = (algo || '').toLowerCase();
+    const useFixedOriginForDijkstra = algoLower === 'dijkstra';
+    const effectiveUserLat = useFixedOriginForDijkstra ? 11.321071 : Number(userLat);
+    const effectiveUserLng = useFixedOriginForDijkstra ? 75.934531 : Number(userLng);
 
     const result = await computeRoute({
       baseDir: ROOT_DIR,

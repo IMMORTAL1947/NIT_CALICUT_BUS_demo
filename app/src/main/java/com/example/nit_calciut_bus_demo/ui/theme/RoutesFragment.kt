@@ -33,7 +33,6 @@ class RoutesFragment : Fragment() {
     private lateinit var stepsAdapter: StepsAdapter
     private var routeMapWebView: WebView? = null
     private var isLeafletReady: Boolean = false
-    private var ignoreBusSelectionEvent: Boolean = false
     private var userLocation: Location? = null
     private var selectedRoutingMode: RoutingMode = RoutingMode.GOOGLE
     private var pendingStopIndex: Int? = null
@@ -127,7 +126,6 @@ class RoutesFragment : Fragment() {
                 busSelector.adapter = adapter
                 // Default selection
                 val defIndex = state.defaultBusIndex.coerceIn(0, names.size - 1)
-                ignoreBusSelectionEvent = true
                 busSelector.setSelection(defIndex)
             }
             // Update routing mode selector without triggering listener loops
@@ -200,18 +198,6 @@ class RoutesFragment : Fragment() {
             viewModel.setRoutingMode(mode)
         }
 
-        busSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (ignoreBusSelectionEvent) {
-                    ignoreBusSelectionEvent = false
-                    return
-                }
-                viewModel.selectBus(position)
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-        }
-
         // Load config immediately; WebView rendering will occur when ready.
         viewModel.loadConfig(requireContext())
     }
@@ -234,7 +220,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3', false);")
+        evalLeafletJs("window.renderRoute(${routeJson}, ${stopsJson}, '#2196F3');")
     }
 
     private fun ensureLocationAndFetch() {
@@ -291,7 +277,7 @@ class RoutesFragment : Fragment() {
                 })
             }
         }
-        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63', true);")
+        evalLeafletJs("window.renderRoute(${pathJson}, [], '#E91E63');")
     }
 
     private fun openGoogleMapsToSelectedStop() {
