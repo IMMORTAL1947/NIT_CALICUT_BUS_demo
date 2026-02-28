@@ -119,6 +119,50 @@ function addDirectedEdge(edgesArray, fromId, toId, distanceMeters) {
   });
 }
 
+function addCustomEdge(edgesArray, fromId, toId, distanceMeters, overrides = {}) {
+  edgesArray.push({
+    from: fromId,
+    to: toId,
+    distance: Math.round(distanceMeters),
+    slopePenalty: 0,
+    stairsPenalty: 0,
+    accessibilityCost: 0,
+    shadedPreference: 0,
+    ...overrides
+  });
+}
+
+function upsertNode(nodesArray, id, lat, lng, name = id) {
+  const existing = nodesArray.find(n => n.id === id);
+  if (existing) return existing;
+  const node = { id, lat: roundCoord(lat), lng: roundCoord(lng), name };
+  nodesArray.push(node);
+  return node;
+}
+
+function addNITCSubway(nodesArray, edgesArray) {
+  // User-provided subway points
+  const entry = upsertNode(nodesArray, 'subway_entry', 11.3198, 75.9345, 'Subway Entry');
+  const exit = upsertNode(nodesArray, 'subway_exit', 11.3197, 75.9345, 'Subway Exit');
+
+  const nearestToEntry = findNearestNode(nodesArray.filter(n => n.id !== entry.id && n.id !== exit.id), entry.lat, entry.lng);
+  const nearestToExit = findNearestNode(nodesArray.filter(n => n.id !== entry.id && n.id !== exit.id), exit.lat, exit.lng);
+
+  const subwayDist = haversineMeters({ lat: entry.lat, lng: entry.lng }, { lat: exit.lat, lng: exit.lng });
+  addCustomEdge(edgesArray, entry.id, exit.id, subwayDist, { stairsPenalty: 2, accessibilityCost: 4 });
+  addCustomEdge(edgesArray, exit.id, entry.id, subwayDist, { stairsPenalty: 2, accessibilityCost: 4 });
+
+  if (nearestToEntry.node) {
+    addCustomEdge(edgesArray, entry.id, nearestToEntry.node.id, nearestToEntry.distance, { stairsPenalty: 2, accessibilityCost: 4 });
+    addCustomEdge(edgesArray, nearestToEntry.node.id, entry.id, nearestToEntry.distance, { stairsPenalty: 2, accessibilityCost: 4 });
+  }
+
+  if (nearestToExit.node) {
+    addCustomEdge(edgesArray, exit.id, nearestToExit.node.id, nearestToExit.distance, { stairsPenalty: 2, accessibilityCost: 4 });
+    addCustomEdge(edgesArray, nearestToExit.node.id, exit.id, nearestToExit.distance, { stairsPenalty: 2, accessibilityCost: 4 });
+  }
+}
+
 function convertGeoJSONToGraph(geojson) {
   const nodeMap = new Map(); // key -> node
   const nodesArray = [];     // [{id, lat, lng}]
@@ -246,6 +290,11 @@ async function main() {
 
   // Snap bus stops
   const { snappedCount, stopNodeIds } = snapStopsToGraph(stopsInfo.stops, nodesArray, edgesArray, snapTol);
+
+  // Add fixed custom campus connectors
+  if (String(code).toUpperCase() === 'NITC') {
+    addNITCSubway(nodesArray, edgesArray);
+  }
 
   // Validate
   const errors = validateGraph(nodesArray, edgesArray, stopNodeIds);
