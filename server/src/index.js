@@ -308,8 +308,8 @@ app.get('/api/colleges/:code/route-to-stop', async (req, res) => {
     // Temporary override: when using Dijkstra, force a fixed origin point
     const algoLower = (algo || '').toLowerCase();
     const useFixedOriginForDijkstra = algoLower === 'dijkstra';
-    const effectiveUserLat = useFixedOriginForDijkstra ? 11.321071 : Number(userLat);
-    const effectiveUserLng = useFixedOriginForDijkstra ? 75.934531 : Number(userLng);
+    const effectiveUserLat = useFixedOriginForDijkstra ? 11.3196 : Number(userLat);
+    const effectiveUserLng = useFixedOriginForDijkstra ? 75.9343 : Number(userLng);
 
     const result = await computeRoute({
       baseDir: ROOT_DIR,
