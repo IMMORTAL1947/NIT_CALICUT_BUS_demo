@@ -20,6 +20,7 @@ import java.util.*
 class RequestFormFragment : Fragment() {
     private lateinit var vm: RequestViewModel
     private var selectedDateTime: Calendar = Calendar.getInstance()
+    private var selectedPickupLocation: String = "Not selected"
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_request_form, container, false)
@@ -35,6 +36,7 @@ class RequestFormFragment : Fragment() {
         val dec = view.findViewById<Button>(R.id.decPassenger)
         val inc = view.findViewById<Button>(R.id.incPassenger)
         val datetimeBtn = view.findViewById<Button>(R.id.datetimeButton)
+        val pickMapBtn = view.findViewById<Button>(R.id.pickMapButton)
         val submit = view.findViewById<Button>(R.id.submitRequest)
 
         var passengers = 1
@@ -43,8 +45,24 @@ class RequestFormFragment : Fragment() {
         inc.setOnClickListener { passengers++; passengerCount.text = passengers.toString() }
 
         datetimeBtn.setOnClickListener { pickDateTime(datetimeBtn) }
+        
+        pickMapBtn.setOnClickListener { 
+            // Navigate to map picker
+            val mapFragment = MapPickerFragment.newInstance { location ->
+                selectedPickupLocation = location
+                pickMapBtn.text = "📍 ${location.take(30)}"
+            }
+            parentFragmentManager.beginTransaction()
+                .replace((view.parent as ViewGroup).id, mapFragment)
+                .addToBackStack(null)
+                .commit()
+        }
 
         submit.setOnClickListener {
+            if (selectedPickupLocation == "Not selected") {
+                Toast.makeText(requireContext(), "Please select a pickup location", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val payload = JSONObject()
             payload.put("route", "LH → City Center")
             payload.put("destination", dest.text.toString())

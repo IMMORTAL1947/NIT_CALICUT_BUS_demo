@@ -36,7 +36,8 @@ class RequestViewModel : ViewModel() {
                 conn.readTimeout = 5000
                 if (conn.responseCode == 200) {
                     val s = conn.inputStream.bufferedReader().use { it.readText() }
-                    val arr = JSONArray(s)
+                    val obj = JSONObject(s)
+                    val arr = obj.getJSONArray("requests")
                     val list = mutableListOf<SpecialRequest>()
                     for (i in 0 until arr.length()) {
                         val o = arr.getJSONObject(i)

@@ -200,13 +200,17 @@ class RoutesViewModel : ViewModel() {
         }
         val routesArr = json.getJSONArray("routes")
         var chosenRoute: JSONObject? = null
-        for (i in 0 until routesArr.length()) {
-            val r = routesArr.getJSONObject(i)
-            if (routeId == null || r.getString("id") == routeId) {
-                chosenRoute = r
-                break
+        // Only match routes where the ID explicitly matches the bus's routeId
+        if (routeId != null) {
+            for (i in 0 until routesArr.length()) {
+                val r = routesArr.getJSONObject(i)
+                if (r.getString("id") == routeId) {
+                    chosenRoute = r
+                    break
+                }
             }
         }
+        // If no matching route found and routeId was null or unmatched, use first route as fallback
         if (chosenRoute == null && routesArr.length() > 0) chosenRoute = routesArr.getJSONObject(0)
 
         routeName = chosenRoute?.optString("name")
