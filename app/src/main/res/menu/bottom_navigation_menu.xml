@@ -14,4 +14,9 @@
         android:id="@+id/navigation_settings"
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="Settings" />
+
+    <item
+        android:id="@+id/navigation_booking"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Booking" />
 </menu>

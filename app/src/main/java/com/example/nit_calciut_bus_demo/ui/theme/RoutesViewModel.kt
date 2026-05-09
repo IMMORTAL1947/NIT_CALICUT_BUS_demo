@@ -43,6 +43,8 @@ data class RouteUiState(
     val dijkstraSteps: List<String>,
     val loading: Boolean,
     val error: String?
+    ,
+    val directionReversed: Boolean = false
 )
 
 class RoutesViewModel : ViewModel() {
@@ -73,6 +75,7 @@ class RoutesViewModel : ViewModel() {
     private var selectedStopIndex: Int? = null
     private var loading: Boolean = false
     private var error: String? = null
+    private var directionReversed: Boolean = false
     private var appContext: Context? = null
 
     fun setUserLocation(loc: Location?) {
@@ -114,6 +117,14 @@ class RoutesViewModel : ViewModel() {
     fun selectBus(index: Int) {
         selectedBusIndex = index.coerceIn(0, busOptions.lastIndex)
         // Recompute route points and stop states for selected bus
+        recomputeRouteForSelectedBus()
+        publishUi()
+    }
+
+    fun setDirectionReversed(reversed: Boolean) {
+        if (directionReversed == reversed) return
+        directionReversed = reversed
+        // Recompute ordering based on new direction
         recomputeRouteForSelectedBus()
         publishUi()
     }
@@ -203,14 +214,34 @@ class RoutesViewModel : ViewModel() {
         stopOrder = (0 until stopIds.length()).map { stopIds.getString(it) }
         routePoints = stopOrder.mapNotNull { id -> stopById[id]?.latLng }
 
-        // Scheduled times map
-        val stopTimes = chosenRoute?.optJSONObject("stopTimes")
+        if (directionReversed) {
+            stopOrder = stopOrder.reversed()
+            routePoints = routePoints.reversed()
+        }
+
+        // Fetch schedules to get departure times for this bus+route combo
+        // For now, show only the first matching schedule's departure time on the first stop
+        val chosenRouteId = chosenRoute?.optString("id")
+        
+        var departureTime: String? = null
+        if (!chosenRouteId.isNullOrEmpty() && !busId.isEmpty()) {
+          val schedulesArr = configJson?.optJSONArray("schedules") ?: JSONArray()
+          for (i in 0 until schedulesArr.length()) {
+            val sch = schedulesArr.getJSONObject(i)
+            if (sch.optString("routeId") == chosenRouteId && sch.optString("busId") == busId) {
+              departureTime = sch.optString("departureTime")
+              break // Use first matching schedule
+            }
+          }
+        }
+
         val states = stopOrder.mapIndexed { idx, id ->
             val meta = stopById[id]
             StopState(
                 index = idx,
                 name = meta?.name ?: id,
-                scheduledTime = stopTimes?.optString(id),
+                // Show departure time only on the first stop; other stops have no scheduled time in the new model
+                scheduledTime = if (idx == 0) departureTime else null,
                 status = StopStatus.UPCOMING,
                 showBusHere = false
             )
@@ -236,7 +267,8 @@ class RoutesViewModel : ViewModel() {
                 dijkstraPath = dijkstraPath,
                 dijkstraSteps = dijkstraSteps,
                 loading = loading,
-                error = error
+                    error = error,
+                    directionReversed = directionReversed
             )
         )
     }

@@ -22,6 +22,7 @@
     let routeLayer = null;
     let stopsLayer = L.layerGroup().addTo(map);
     let busMarker = null;
+    let lastPoints = [];
 
     function fitIfNeeded(points) {
       if (!points || points.length === 0) return;
@@ -29,6 +30,18 @@
       if (bounds.isValid()) {
         map.fitBounds(bounds, { padding: [24, 24] });
       }
+    }
+
+    window.zoomIn = function() {
+      map.zoomIn();
+    }
+
+    window.zoomOut = function() {
+      map.zoomOut();
+    }
+
+    window.recenterMap = function() {
+      fitIfNeeded(lastPoints);
     }
 
     window.renderRoute = function(routePoints, stopMarkers, colorHex, showPolyline) {
@@ -65,6 +78,8 @@
         allPoints.push({ lat: p.lat, lng: p.lng });
       }
 
+      lastPoints = allPoints;
+
       fitIfNeeded(allPoints);
     }
 
@@ -88,6 +103,14 @@
         }).addTo(map).bindPopup('Live Bus');
       } else {
         busMarker.setLatLng(pos);
+      }
+
+      lastPoints = [];
+      if (routeLayer) {
+        const routePoints = routeLayer.getLatLngs();
+        if (Array.isArray(routePoints)) {
+          routePoints.flat().forEach(p => lastPoints.push({ lat: p.lat, lng: p.lng }));
+        }
       }
     }
   </script>

@@ -30,6 +30,10 @@ class MapsActivity : AppCompatActivity() {
                     loadFragment(RoutesFragment())
                     true
                 }
+                R.id.navigation_booking -> {
+                    loadFragment(SpecialRequestFragment())
+                    true
+                }
                 R.id.navigation_settings -> {
                     loadFragment(SettingsFragment())
                     true

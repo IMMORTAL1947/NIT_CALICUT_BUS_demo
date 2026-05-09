@@ -53,21 +53,31 @@
         <button id="saveStops">Save Stops</button>
 
         <h2>Routes</h2>
-        <p>Create a route by ordering stop IDs (comma separated). Optionally set times per stop and assign a bus.</p>
+        <p>Create a route by ordering stop IDs (comma separated).</p>
         <div>
           <input id="routeName" placeholder="Route name" />
           <input id="routeColor" type="color" value="#f44336" />
           <input id="routeStopIds" placeholder="e.g. s1,s3,s2" />
           <button id="addRoute">Add/Update Route</button>
         </div>
-        <div style="margin-top:8px;">
-          <label>Bus Name (assigns to this route)</label>
-          <input id="routeBusName" placeholder="e.g. Bus 1" />
-        </div>
         <ul id="routesList"></ul>
-        <button id="genStopTimes">Generate Stop Times</button>
-        <div id="routeTimes" style="margin-top:8px;"></div>
         <button id="saveRoutes">Save Routes</button>
+
+        <h2>Bus Schedules</h2>
+        <p>Set departure times for buses on routes. Same bus can run the same route multiple times per day.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 12px;">
+          <select id="scheduleRouteId" placeholder="Select Route" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            <option value="">Select Route</option>
+          </select>
+          <select id="scheduleBusId" placeholder="Select Bus" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
+            <option value="">Select Bus</option>
+          </select>
+          <input id="scheduleDepartureTime" type="time" placeholder="Departure Time" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+          <input id="scheduleActiveDays" placeholder="Days (MON,TUE,WED,THU,FRI)" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;" />
+          <input id="scheduleId" type="hidden" />
+          <button id="addScheduleBtn" style="padding: 8px 12px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">Add Schedule</button>
+        </div>
+        <div id="schedulesList"></div>
 
         <h2>Buses & Live Tracking</h2>
         <p class="section-note">Set up buses for live GPS tracking. Create a bus, generate a driver token, and share the driver tracking page to start location updates.</p>
@@ -78,6 +88,20 @@
         </div>
         <ul id="busesList"></ul>
         <button id="saveBuses">Save Bus Settings</button>
+
+        <h2>On-Demand Booking Requests</h2>
+        <p class="section-note">Manage user requests for on-demand transport. Review pending requests and approve or reject them.</p>
+        <div style="margin-bottom: 8px;">
+          <label>Filter by Status:</label>
+          <select id="requestStatusFilter">
+            <option value="">All</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+          <button id="refreshRequests">Refresh</button>
+        </div>
+        <div id="requestsList" style="max-height: 400px; overflow-y: auto;"></div>
       </div>
     </section>
   </main>

@@ -32,7 +32,7 @@
           "id": "s5",
           "name": "LH",
           "lat": 11.318333333333333,
-          "lng": 75.93102777777778
+          "lng": 75.93102777777779
         },
         {
           "id": "s6",
@@ -74,40 +74,69 @@
           "stopTimes": {}
         },
         {
-          "id": "new-mega-boys",
-          "name": "NEW MEGA BOYS HOSTEL",
-          "color": "#f44336",
+          "id": "soms",
+          "name": "SOMS",
+          "color": "#3734f4",
           "stopIds": [
-            "s9",
+            "s6",
+            "s5",
             "s2",
             "s3",
             "s4",
             "s8"
-          ],
-          "stopTimes": {}
-        },
-        {
-          "id": "soms",
-          "name": "soms",
-          "color": "#f44336",
-          "stopIds": [
-            "s2",
-            "s1",
-            "s4",
-            "s2"
           ],
           "stopTimes": {}
         },
         {
           "id": "newmbh",
           "name": "NEWMBH",
-          "color": "#f44336",
+          "color": "#3734f4",
           "stopIds": [
             "s9",
             "s2",
             "s3",
             "s4",
             "s8"
+          ],
+          "stopTimes": {}
+        },
+        {
+          "id": "eclhc_newmbh",
+          "name": "ECLHC_NEWMBH",
+          "color": "#3734f4",
+          "stopIds": [
+            "s8",
+            "s4",
+            "s3",
+            "s2",
+            "s9"
+          ],
+          "stopTimes": {}
+        },
+        {
+          "id": "eclhc_soms",
+          "name": "ECLHC_SOMS",
+          "color": "#3734f4",
+          "stopIds": [
+            "s8",
+            "s4",
+            "s3",
+            "s2",
+            "s5",
+            "s6"
+          ],
+          "stopTimes": {}
+        },
+        {
+          "id": "eclhc_lh",
+          "name": "ECLHC_LH",
+          "color": "#3734f4",
+          "stopIds": [
+            "s8",
+            "s4",
+            "s3",
+            "s2",
+            "s5"
           ],
           "stopTimes": {}
         }
@@ -123,8 +152,65 @@
           "id": "newmbh",
           "name": "NEWMBH",
           "routeId": "newmbh"
+        },
+        {
+          "id": "bus2",
+          "name": "BUS2",
+          "routeId": "LH"
+        },
+        {
+          "id": "bus3",
+          "name": "BUS3",
+          "routeId": "NEWMBH"
+        },
+        {
+          "id": "bus4",
+          "name": "BUS4",
+          "routeId": "NEWMBH"
         }
-      ]
+      ],
+      "schedules": [
+        {
+          "id": "ryZr3OZJ",
+          "routeId": "lh",
+          "busId": "bus4",
+          "departureTime": "07:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "MQn0heHO",
+          "routeId": "lh",
+          "busId": "bus3",
+          "departureTime": "07:45",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "yGeF5jVS",
+          "routeId": "newmbh",
+          "busId": "bus1",
+          "departureTime": "07:20",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        }
+      ],
+      "requests": []
     },
     "NIT_CAL": {
       "code": "NIT_CAL",
@@ -161,7 +247,9 @@
           ]
         }
       ],
-      "buses": []
+      "buses": [],
+      "schedules": [],
+      "requests": []
     },
     "IIT_D": {
       "code": "IIT_D",
@@ -214,13 +302,7 @@
             "s4",
             "s3",
             "s7"
-          ],
-          "stopTimes": {
-            "s5": "08:23",
-            "s4": "09:21",
-            "s3": "05:42",
-            "s7": "11:04"
-          }
+          ]
         }
       ],
       "buses": [
@@ -234,14 +316,32 @@
           "name": "BUS1",
           "routeId": "HOSPITAL"
         }
-      ]
+      ],
+      "schedules": [
+        {
+          "id": "Y9FNyGXR",
+          "routeId": "hospital",
+          "busId": "iit-block",
+          "departureTime": "05:42",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        }
+      ],
+      "requests": []
     },
     "IITB": {
       "code": "IITB",
       "name": "IIT BOMBAY",
       "stops": [],
       "routes": [],
-      "buses": []
+      "buses": [],
+      "schedules": [],
+      "requests": []
     }
   }
 }

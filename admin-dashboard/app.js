@@ -14,21 +14,75 @@ let searchMarkers = [];
 let stops = [];
 let routes = [];
 let buses = [];
+let schedules = [];
+let requests = [];
 
 const $ = (id) => document.getElementById(id);
+
+// Auto-load default college on page load
+window.addEventListener('DOMContentLoaded', () => {
+  const defaultCode = 'NITC'; // Default college code
+  $('collegeCode').value = defaultCode;
+  $('collegeName').value = 'NIT CALICUT';
+  loadCollege(defaultCode);
+});
 
 function renderStopsList() {
   const ul = $('stopsList');
   ul.innerHTML = '';
   stops.forEach((s, idx) => {
     const li = document.createElement('li');
-    li.innerHTML = `ID: <b>${s.id}</b> | <input value="${s.name}" data-idx="${idx}" class="stopName" /> (${s.lat.toFixed(6)}, ${s.lng.toFixed(6)})`;
+    li.style.display = 'flex';
+    li.style.alignItems = 'center';
+    li.style.gap = '8px';
+    li.style.marginBottom = '8px';
+    li.style.paddingBottom = '8px';
+    li.style.borderBottom = '1px solid #e6e6e6';
+
+    const idSpan = document.createElement('span');
+    idSpan.innerHTML = `<b>${s.id}</b>`;
+
+    const input = document.createElement('input');
+    input.value = s.name;
+    input.dataset.idx = idx;
+    input.className = 'stopName';
+    input.style.flex = '1';
+
+    const coordsSpan = document.createElement('span');
+    coordsSpan.textContent = `(${s.lat.toFixed(6)}, ${s.lng.toFixed(6)})`;
+    coordsSpan.className = 'coords';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'danger-btn deleteStop';
+    deleteBtn.dataset.idx = idx;
+    deleteBtn.style.backgroundColor = '#f44336';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.border = '1px solid #d32f2f';
+    deleteBtn.style.padding = '6px 12px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.borderRadius = '4px';
+    deleteBtn.style.fontSize = '0.9rem';
+    deleteBtn.style.flexShrink = '0';
+
+    li.appendChild(idSpan);
+    li.appendChild(input);
+    li.appendChild(coordsSpan);
+    li.appendChild(deleteBtn);
     ul.appendChild(li);
   });
   ul.querySelectorAll('.stopName').forEach(inp => {
     inp.addEventListener('input', (e) => {
       const idx = Number(e.target.dataset.idx);
       stops[idx].name = e.target.value;
+    });
+  });
+  ul.querySelectorAll('.deleteStop').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      stops.splice(idx, 1);
+      refreshMarkers();
+      renderStopsList();
     });
   });
 }
@@ -115,13 +169,232 @@ async function loadCollege(code) {
     stops = cfg.stops || [];
     routes = cfg.routes || [];
     buses = cfg.buses || [];
+    schedules = cfg.schedules || [];
     refreshMarkers();
     renderStopsList();
     renderRoutesList();
     renderBusesList();
+    renderSchedulesList();
+    updateScheduleDropdowns();
     $('status').textContent = `Loaded ${code}`;
   } catch (e) {
     $('status').textContent = `Load failed: ${e.message}`;
+  }
+}
+
+function updateScheduleDropdowns() {
+  const routeSelect = $('scheduleRouteId');
+  const busSelect = $('scheduleBusId');
+  
+  if (!routeSelect || !busSelect) {
+    console.error('Schedule dropdown elements not found');
+    return;
+  }
+  
+  // Populate routes
+  routeSelect.innerHTML = '<option value="">Select Route</option>';
+  if (routes && routes.length > 0) {
+    routes.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = r.name || r.id;
+      routeSelect.appendChild(opt);
+    });
+  } else {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '(No routes available)';
+    routeSelect.appendChild(opt);
+  }
+  
+  // Populate buses
+  busSelect.innerHTML = '<option value="">Select Bus</option>';
+  if (buses && buses.length > 0) {
+    buses.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name || b.id;
+      busSelect.appendChild(opt);
+    });
+  } else {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = '(No buses available)';
+    busSelect.appendChild(opt);
+  }
+}
+
+function renderSchedulesList() {
+  const container = $('schedulesList');
+  container.innerHTML = '';
+  
+  if (schedules.length === 0) {
+    container.innerHTML = '<p style="padding: 16px; color: #999;">No schedules added yet</p>';
+    return;
+  }
+  
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  table.style.fontSize = '0.9em';
+  
+  // Header
+  const headerRow = document.createElement('tr');
+  headerRow.style.backgroundColor = '#f5f5f5';
+  headerRow.style.borderBottom = '2px solid #ddd';
+  ['Bus', 'Route', 'Departure', 'Days', 'Actions'].forEach(col => {
+    const th = document.createElement('th');
+    th.textContent = col;
+    th.style.padding = '10px';
+    th.style.textAlign = 'left';
+    th.style.fontWeight = 'bold';
+    th.style.borderBottom = '2px solid #ddd';
+    headerRow.appendChild(th);
+  });
+  table.appendChild(headerRow);
+  
+  // Rows
+  schedules.forEach((sch) => {
+    const bus = buses.find(b => b.id === sch.busId);
+    const route = routes.find(r => r.id === sch.routeId);
+    if (!bus || !route) return; // Skip orphaned schedules
+    
+    const row = document.createElement('tr');
+    row.style.borderBottom = '1px solid #eee';
+    row.dataset.scheduleId = sch.id;
+    
+    const busName = bus.name || sch.busId;
+    const routeName = route.name || sch.routeId;
+    const depTime = sch.departureTime;
+    const days = (sch.activeDays || []).join(', ');
+    
+    const cells = [busName, routeName, depTime, days];
+    cells.forEach(cellText => {
+      const td = document.createElement('td');
+      td.textContent = cellText;
+      td.style.padding = '10px';
+      td.style.borderBottom = '1px solid #eee';
+      row.appendChild(td);
+    });
+    
+    // Actions
+    const actionsTd = document.createElement('td');
+    actionsTd.style.padding = '10px';
+    
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'Edit';
+    editBtn.style.backgroundColor = '#2196f3';
+    editBtn.style.color = 'white';
+    editBtn.style.padding = '4px 8px';
+    editBtn.style.border = 'none';
+    editBtn.style.borderRadius = '3px';
+    editBtn.style.cursor = 'pointer';
+    editBtn.style.marginRight = '4px';
+    editBtn.style.fontSize = '0.85em';
+    editBtn.onclick = () => editSchedule(sch);
+    
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.style.backgroundColor = '#f44336';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.padding = '4px 8px';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.borderRadius = '3px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.fontSize = '0.85em';
+    deleteBtn.onclick = () => deleteSchedule(sch.id);
+    
+    actionsTd.appendChild(editBtn);
+    actionsTd.appendChild(deleteBtn);
+    row.appendChild(actionsTd);
+    table.appendChild(row);
+  });
+  
+  container.appendChild(table);
+}
+
+function editSchedule(schedule) {
+  $('scheduleRouteId').value = schedule.routeId;
+  $('scheduleBusId').value = schedule.busId;
+  $('scheduleDepartureTime').value = schedule.departureTime;
+  $('scheduleActiveDays').value = (schedule.activeDays || []).join(',');
+  $('scheduleId').value = schedule.id;
+  $('addScheduleBtn').textContent = 'Update Schedule';
+}
+
+$('addScheduleBtn').onclick = async () => {
+  const code = $('collegeCode').value.trim();
+  if (!code) return alert('Enter college code first');
+  
+  const routeId = $('scheduleRouteId').value.trim();
+  const busId = $('scheduleBusId').value.trim();
+  const departureTime = $('scheduleDepartureTime').value.trim();
+  const activeDaysStr = $('scheduleActiveDays').value.trim();
+  const activeDays = activeDaysStr ? activeDaysStr.split(',').map(d => d.trim().toUpperCase()) : ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+  const scheduleId = $('scheduleId').value.trim();
+  
+  if (!routeId || !busId || !departureTime) {
+    return alert('Select route, bus, and departure time');
+  }
+  
+  try {
+    let res;
+    if (scheduleId) {
+      // Update
+      res = await fetch(`${API_BASE}/colleges/${code}/schedules/${scheduleId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ routeId, busId, departureTime, activeDays })
+      });
+    } else {
+      // Create
+      res = await fetch(`${API_BASE}/colleges/${code}/schedules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ routeId, busId, departureTime, activeDays })
+      });
+    }
+    
+    if (!res.ok) throw new Error(`Failed: ${res.status}`);
+    const sch = await res.json();
+    
+    if (scheduleId) {
+      const idx = schedules.findIndex(s => s.id === scheduleId);
+      if (idx >= 0) schedules[idx] = sch;
+    } else {
+      schedules.push(sch);
+    }
+    
+    renderSchedulesList();
+    $('scheduleRouteId').value = '';
+    $('scheduleBusId').value = '';
+    $('scheduleDepartureTime').value = '';
+    $('scheduleActiveDays').value = '';
+    $('scheduleId').value = '';
+    $('addScheduleBtn').textContent = 'Add Schedule';
+    $('status').textContent = `Schedule ${scheduleId ? 'updated' : 'added'}`;
+  } catch (e) {
+    $('status').textContent = `Error: ${e.message}`;
+  }
+};
+
+async function deleteSchedule(scheduleId) {
+  if (!confirm('Delete this schedule?')) return;
+  const code = $('collegeCode').value.trim();
+  if (!code) return;
+  
+  try {
+    const res = await fetch(`${API_BASE}/colleges/${code}/schedules/${scheduleId}`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error(`Failed: ${res.status}`);
+    
+    const idx = schedules.findIndex(s => s.id === scheduleId);
+    if (idx >= 0) schedules.splice(idx, 1);
+    renderSchedulesList();
+    $('status').textContent = 'Schedule deleted';
+  } catch (e) {
+    $('status').textContent = `Delete failed: ${e.message}`;
   }
 }
 
@@ -140,16 +413,7 @@ $('addRoute').onclick = () => {
   if (!name || stopIds.length === 0) return alert('Enter route name and stop IDs');
   const id = name.toLowerCase().replace(/\s+/g,'-');
   const existingIdx = routes.findIndex(r => r.id === id);
-  const stopTimes = collectTimes(stopIds);
-  const busName = $('routeBusName').value.trim();
-  // If busName provided, ensure buses array has mapping to this route
-  if (busName) {
-    const busId = busName.toLowerCase().replace(/\s+/g,'-');
-    const bIdx = buses.findIndex(b => b.id === busId);
-    const bus = { id: busId, name: busName, routeId: id };
-    if (bIdx >= 0) buses[bIdx] = bus; else buses.push(bus);
-  }
-  const route = { id, name, color, stopIds, stopTimes };
+  const route = { id, name, color, stopIds };
   if (existingIdx >= 0) routes[existingIdx] = route; else routes.push(route);
   renderRoutesList();
 };
@@ -159,13 +423,45 @@ function renderRoutesList() {
   ul.innerHTML = '';
   routes.forEach(r => {
     const li = document.createElement('li');
+    li.style.display = 'flex';
+    li.style.alignItems = 'center';
+    li.style.gap = '8px';
+    li.style.marginBottom = '8px';
+    li.style.paddingBottom = '8px';
+    li.style.borderBottom = '1px solid #e6e6e6';
     const bus = (buses.find(b => b.routeId === r.id) || {}).name || '';
     const times = r.stopTimes || {};
     const ss = r.stopIds.map(id => `${id}${times[id] ? ' @'+times[id] : ''}`).join(' -> ');
-    li.textContent = `${r.name}${bus ? ' • '+bus : ''} (${r.id}) - ${ss}`;
     li.style.borderLeft = `8px solid ${r.color}`;
     li.style.paddingLeft = '8px';
+
+    const textSpan = document.createElement('span');
+    textSpan.innerHTML = `<b>${r.name}</b>${bus ? ' • '+bus : ''} <small>(${r.id}) - ${ss}</small>`;
+    textSpan.style.flex = '1';
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'danger-btn deleteRoute';
+    deleteBtn.dataset.idx = routes.indexOf(r);
+    deleteBtn.style.backgroundColor = '#f44336';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.border = '1px solid #d32f2f';
+    deleteBtn.style.padding = '6px 12px';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.borderRadius = '4px';
+    deleteBtn.style.fontSize = '0.9rem';
+    deleteBtn.style.flexShrink = '0';
+
+    li.appendChild(textSpan);
+    li.appendChild(deleteBtn);
     ul.appendChild(li);
+  });
+  ul.querySelectorAll('.deleteRoute').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      routes.splice(idx, 1);
+      renderRoutesList();
+    });
   });
 }
 
@@ -175,34 +471,6 @@ $('saveRoutes').onclick = async () => {
   const res = await fetch(`${API_BASE}/colleges/${code}/routes`, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ routes }) });
   const json = await res.json();
   $('status').textContent = `Saved ${json.routes.length} routes.`;
-};
-
-function collectTimes(stopIds) {
-  const container = $('routeTimes');
-  const inputs = container.querySelectorAll('input[data-stop]');
-  const out = {};
-  inputs.forEach(inp => { const sid = inp.dataset.stop; const v = inp.value.trim(); if (v) out[sid] = v; });
-  // ensure only for current stopIds
-  Object.keys(out).forEach(k => { if (!stopIds.includes(k)) delete out[k]; });
-  return out;
-}
-
-$('genStopTimes').onclick = () => {
-  let ids = $('routeStopIds').value.split(',').map(s => s.trim()).filter(Boolean);
-  if (ids.length === 0 && routes.length > 0) {
-    ids = (routes[routes.length - 1].stopIds || []).slice();
-  }
-  const container = $('routeTimes');
-  container.innerHTML = '';
-  if (ids.length === 0) { container.textContent = 'Enter stop IDs above or add a route first'; return; }
-  const list = document.createElement('div');
-  ids.forEach(id => {
-    const row = document.createElement('div');
-    row.style.margin = '6px 0';
-    row.innerHTML = `<label style="display:inline-block;width:140px;">${id}</label> <input type="time" data-stop="${id}" placeholder="ETA" />`;
-    list.appendChild(row);
-  });
-  container.appendChild(list);
 };
 
 // Buses
@@ -275,7 +543,157 @@ $('saveBuses').onclick = async () => {
   const json = await res.json();
   $('status').textContent = `Saved bus settings for ${json.buses.length} bus(es).`;
 };
+// ===== On-Demand Booking Requests =====
 
+async function loadRequests() {
+  const code = $('collegeCode').value.trim();
+  if (!code) return;
+  try {
+    const res = await fetch(`${API_BASE}/colleges/${code}/requests`);
+    const json = await res.json();
+    requests = json.requests || [];
+    renderRequestsList();
+  } catch (e) {
+    $('status').textContent = `Load requests failed: ${e.message}`;
+  }
+}
+
+function renderRequestsList() {
+  const container = $('requestsList');
+  container.innerHTML = '';
+  const statusFilter = $('requestStatusFilter').value;
+  const filtered = statusFilter ? requests.filter(r => r.status === statusFilter) : requests;
+  
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="padding: 16px; color: #999;">No requests found</p>';
+    return;
+  }
+  
+  const table = document.createElement('table');
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  table.style.fontSize = '0.9em';
+  
+  // Header
+  const headerRow = document.createElement('tr');
+  headerRow.style.backgroundColor = '#f5f5f5';
+  headerRow.style.borderBottom = '2px solid #ddd';
+  ['ID', 'Route', 'Pickup', 'Destination', 'DateTime', 'Passengers', 'Status', 'Actions'].forEach(col => {
+    const th = document.createElement('th');
+    th.textContent = col;
+    th.style.padding = '8px';
+    th.style.textAlign = 'left';
+    th.style.fontWeight = 'bold';
+    headerRow.appendChild(th);
+  });
+  table.appendChild(headerRow);
+  
+  // Rows
+  filtered.forEach((req, idx) => {
+    const row = document.createElement('tr');
+    row.style.borderBottom = '1px solid #eee';
+    row.dataset.idx = idx;
+    
+    const cells = [
+      req.id,
+      req.route || '-',
+      `(${(req.pickupLat || 0).toFixed(4)}, ${(req.pickupLng || 0).toFixed(4)})`,
+      req.destination || '-',
+      new Date(req.dateTime).toLocaleString() || '-',
+      req.passengers || '-',
+      req.status || 'PENDING'
+    ];
+    
+    cells.forEach(cellText => {
+      const td = document.createElement('td');
+      td.textContent = cellText;
+      td.style.padding = '8px';
+      td.style.borderBottom = '1px solid #eee';
+      row.appendChild(td);
+    });
+    
+    // Actions cell
+    const actionsTd = document.createElement('td');
+    actionsTd.style.padding = '8px';
+    
+    if (req.status === 'PENDING') {
+      const approveBtn = document.createElement('button');
+      approveBtn.textContent = 'Approve';
+      approveBtn.style.backgroundColor = '#4caf50';
+      approveBtn.style.color = 'white';
+      approveBtn.style.padding = '4px 8px';
+      approveBtn.style.border = 'none';
+      approveBtn.style.borderRadius = '3px';
+      approveBtn.style.cursor = 'pointer';
+      approveBtn.style.marginRight = '4px';
+      approveBtn.style.fontSize = '0.85em';
+      approveBtn.dataset.requestId = req.id;
+      approveBtn.onclick = (e) => updateRequestStatus(req.id, 'APPROVED');
+      
+      const rejectBtn = document.createElement('button');
+      rejectBtn.textContent = 'Reject';
+      rejectBtn.style.backgroundColor = '#f44336';
+      rejectBtn.style.color = 'white';
+      rejectBtn.style.padding = '4px 8px';
+      rejectBtn.style.border = 'none';
+      rejectBtn.style.borderRadius = '3px';
+      rejectBtn.style.cursor = 'pointer';
+      rejectBtn.style.fontSize = '0.85em';
+      rejectBtn.dataset.requestId = req.id;
+      rejectBtn.onclick = (e) => updateRequestStatus(req.id, 'REJECTED');
+      
+      actionsTd.appendChild(approveBtn);
+      actionsTd.appendChild(rejectBtn);
+    } else {
+      const statusSpan = document.createElement('span');
+      statusSpan.textContent = req.status;
+      statusSpan.style.padding = '4px 8px';
+      statusSpan.style.borderRadius = '3px';
+      statusSpan.style.backgroundColor = req.status === 'APPROVED' ? '#e8f5e9' : '#ffebee';
+      statusSpan.style.color = req.status === 'APPROVED' ? '#2e7d32' : '#c62828';
+      statusSpan.style.fontSize = '0.85em';
+      actionsTd.appendChild(statusSpan);
+    }
+    
+    row.appendChild(actionsTd);
+    table.appendChild(row);
+  });
+  
+  container.appendChild(table);
+}
+
+async function updateRequestStatus(requestId, status) {
+  const code = $('collegeCode').value.trim();
+  if (!code) return alert('Enter college code first');
+  
+  try {
+    const res = await fetch(`${API_BASE}/colleges/${code}/requests/${requestId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+    const json = await res.json();
+    const idx = requests.findIndex(r => r.id === requestId);
+    if (idx >= 0) requests[idx] = json;
+    renderRequestsList();
+    $('status').textContent = `Request ${requestId} updated to ${status}`;
+  } catch (e) {
+    $('status').textContent = `Update failed: ${e.message}`;
+  }
+}
+
+$('refreshRequests').onclick = loadRequests;
+$('requestStatusFilter').onchange = renderRequestsList;
+
+// Hook into loadCollege to also load requests
+const originalLoadCollege = window.loadCollege;
+if (originalLoadCollege) {
+  window.loadCollege = async function(code) {
+    await originalLoadCollege.call(this, code);
+    loadRequests();
+  };
+}
 // Map place search via Nominatim
 async function searchPlaces(q) {
   const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(q)}`;

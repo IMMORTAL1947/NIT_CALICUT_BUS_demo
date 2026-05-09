@@ -17,3 +17,6 @@ small.hint { display:block; color:#777; margin-top:4px; }
 .section-note { color:#999; font-size:0.95rem; margin:4px 0 8px; }
 .hint-link { display:inline-block; margin-top:4px; color:#4caf50; text-decoration:none; }
 .hint-link:hover { text-decoration:underline; }
+button { padding: 6px 12px; cursor: pointer; border: 1px solid #ddd; background: #f5f5f5; border-radius: 4px; font-size: 0.9rem; }
+button:hover { background: #e8e8e8; }
+.danger-btn { background-color: #f44336 !important; color: white !important; border: 1px solid #d32f2f !important; }

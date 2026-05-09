@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bus_screen_bg">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/srTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Special Bus Request"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/bus_on_surface" />
+
+            <TextView
+                android:id="@+id/srSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Request transport for special needs"
+                android:textSize="14sp"
+                android:textColor="@color/bus_on_surface_variant" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/requestsRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:nestedScrollingEnabled="false" />
+
+            <TextView
+                android:id="@+id/srEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_section_pill"
+                android:text="No requests yet — tap + to create one"
+                android:textColor="@color/bus_on_surface_variant"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabNewRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/bus_primary"
+        app:tint="@android:color/white"
+        app:layout_anchor="@id/requestsRecycler" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

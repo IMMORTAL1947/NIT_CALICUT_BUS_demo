@@ -2,12 +2,12 @@ package com.example.nit_calciut_bus_demo.ui.theme
 
 import android.location.Location
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -20,11 +20,14 @@ import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.example.nit_calciut_bus_demo.R
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.math.roundToInt
 
 class RoutesFragment : Fragment() {
 
@@ -36,6 +39,12 @@ class RoutesFragment : Fragment() {
     private var userLocation: Location? = null
     private var selectedRoutingMode: RoutingMode = RoutingMode.GOOGLE
     private var pendingStopIndex: Int? = null
+    private var routeDistanceText: TextView? = null
+    private var routeTimeText: TextView? = null
+    private var routeStopsText: TextView? = null
+    private var mapLoadingOverlay: View? = null
+    private var emptyStateText: TextView? = null
+    private var busSelector: Spinner? = null
 
     private val locationPermLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -65,9 +74,19 @@ class RoutesFragment : Fragment() {
         // Ensure location permission and fetch latest location
         ensureLocationAndFetch()
 
-        val busSelector = view.findViewById<Spinner>(R.id.busSelector)
+        busSelector = view.findViewById(R.id.busSelector)
+        val directionSelector = view.findViewById<Spinner>(R.id.directionSelector)
         val routeTitle = view.findViewById<TextView>(R.id.routeTitle)
-        val busTitle = view.findViewById<TextView>(R.id.busTitle)
+        val liveStatusText = view.findViewById<TextView>(R.id.liveStatusText)
+        routeDistanceText = view.findViewById(R.id.distanceValueText)
+        routeTimeText = view.findViewById(R.id.timeValueText)
+        routeStopsText = view.findViewById(R.id.stopsCountText)
+        mapLoadingOverlay = view.findViewById(R.id.mapLoadingOverlay)
+        emptyStateText = view.findViewById(R.id.emptyStateText)
+        val routeSubtitle = view.findViewById<TextView>(R.id.routeSubtitle)
+        val recenterButton = view.findViewById<View>(R.id.recenterButton)
+        val zoomInButton = view.findViewById<View>(R.id.zoomInButton)
+        val zoomOutButton = view.findViewById<View>(R.id.zoomOutButton)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.stopsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -109,25 +128,82 @@ class RoutesFragment : Fragment() {
         val webView = view.findViewById<WebView>(R.id.routeMapWebView)
         routeMapWebView = webView
         setupLeafletMap(webView)
+        enableParentScrollLockWhileTouching(webView)
 
-        val routingModeGroup = view.findViewById<RadioGroup>(R.id.routingModeGroup)
+        val routingModeGroup = view.findViewById<ChipGroup>(R.id.routingModeGroup)
+        val routingModeGoogle = view.findViewById<Chip>(R.id.routingModeGoogle)
+        val routingModeCampus = view.findViewById<Chip>(R.id.routingModeCampus)
         val routingModeNote = view.findViewById<TextView>(R.id.routingModeNote)
         val stepsHeader = view.findViewById<TextView>(R.id.stepsHeader)
 
+        if (directionSelector.adapter == null) {
+            // We'll set adapter entries dynamically once route stops are available
+            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, mutableListOf())
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            directionSelector.adapter = adapter
+        }
+
+        // Update direction labels when route data changes and notify VM on user change
+        directionSelector.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val currentlyReversed = viewModel.uiState.value?.directionReversed ?: false
+                val desiredReversed = position == 1
+                if (currentlyReversed != desiredReversed) {
+                    viewModel.setDirectionReversed(desiredReversed)
+                }
+            }
+
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+        }
+
+        recenterButton.setOnClickListener { focusOnUserLocation() }
+        zoomInButton.setOnClickListener { evalLeafletJs("window.zoomIn();") }
+        zoomOutButton.setOnClickListener { evalLeafletJs("window.zoomOut();") }
+
+        routingModeGoogle.setOnClickListener { if (selectedRoutingMode != RoutingMode.GOOGLE) routingModeGroup.check(routingModeGoogle.id) }
+        routingModeCampus.setOnClickListener { if (selectedRoutingMode != RoutingMode.DIJKSTRA) routingModeGroup.check(routingModeCampus.id) }
+
+        val liveDot = view.findViewById<View>(R.id.liveDot)
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             if (state == null) return@observe
+            emptyStateText?.visibility = if (state.routePoints.isEmpty()) View.VISIBLE else View.GONE
             routeTitle.text = state.routeName ?: "Route"
-            busTitle.text = state.busName ?: "Bus"
+            routeSubtitle.text = state.busName ?: "Track bus routes in real time"
+            // Show Live only when a bus position is available
+            if (state.busLatLng != null) {
+                liveStatusText.text = "Live"
+                liveStatusText.setTextColor(ContextCompat.getColor(requireContext(), R.color.bus_success))
+                liveDot.setBackgroundResource(R.drawable.circle_current)
+            } else {
+                liveStatusText.text = "Offline"
+                liveStatusText.setTextColor(ContextCompat.getColor(requireContext(), R.color.bus_on_surface_variant))
+                liveDot.setBackgroundResource(R.drawable.circle_offline)
+            }
             // Populate bus selector when options ready
-            if (busSelector.adapter == null && state.busOptions.isNotEmpty()) {
+            if (busSelector?.adapter == null && state.busOptions.isNotEmpty()) {
                 val names = state.busOptions.map { it.second }
                 val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, names)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                busSelector.adapter = adapter
+                busSelector?.adapter = adapter
                 // Default selection
                 val defIndex = state.defaultBusIndex.coerceIn(0, names.size - 1)
-                busSelector.setSelection(defIndex)
+                busSelector?.setSelection(defIndex)
             }
+                // Update direction spinner labels to use actual stop names (start ⇄ end)
+                if (state.stopMarkers.isNotEmpty()) {
+                    val startName = state.stopMarkers.first().second
+                    val endName = state.stopMarkers.last().second
+                    val labels = listOf("$startName ⇄ $endName", "$endName ⇄ $startName")
+                    val dirAdapter = directionSelector.adapter as? ArrayAdapter<String>
+                    dirAdapter?.let { adp ->
+                        adp.clear()
+                        adp.addAll(labels)
+                        adp.notifyDataSetChanged()
+                        // set selection based on VM state
+                        val sel = if (state.directionReversed) 1 else 0
+                        if (directionSelector.selectedItemPosition != sel) directionSelector.setSelection(sel)
+                    }
+                }
             // Update routing mode selector without triggering listener loops
             selectedRoutingMode = state.routingMode
             val desiredCheckedId = if (state.routingMode == RoutingMode.GOOGLE) {
@@ -135,9 +211,7 @@ class RoutesFragment : Fragment() {
             } else {
                 R.id.routingModeCampus
             }
-            if (routingModeGroup.checkedRadioButtonId != desiredCheckedId) {
-                routingModeGroup.check(desiredCheckedId)
-            }
+            if (routingModeGroup.checkedChipId != desiredCheckedId) routingModeGroup.check(desiredCheckedId)
             routingModeNote.visibility = if (state.routingMode == RoutingMode.DIJKSTRA) View.VISIBLE else View.GONE
             // Render map overlays
             if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraPath.isNotEmpty()) {
@@ -146,6 +220,7 @@ class RoutesFragment : Fragment() {
                 renderRouteOnMap(state.routePoints, state.stopMarkers)
             }
             updateBusMarker(state.busLatLng)
+            updateRouteMetrics(state)
 
             if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraSteps.isNotEmpty()) {
                 stepsHeader.visibility = View.VISIBLE
@@ -192,13 +267,14 @@ class RoutesFragment : Fragment() {
             }
         }
 
-        routingModeGroup.setOnCheckedChangeListener { _, checkedId ->
+        routingModeGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: R.id.routingModeGoogle
             val mode = if (checkedId == R.id.routingModeCampus) RoutingMode.DIJKSTRA else RoutingMode.GOOGLE
             selectedRoutingMode = mode
             viewModel.setRoutingMode(mode)
         }
 
-        busSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        busSelector?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 viewModel.selectBus(position)
             }
@@ -210,7 +286,35 @@ class RoutesFragment : Fragment() {
         viewModel.loadConfig(requireContext())
     }
 
+    private fun updateRouteMetrics(state: RouteUiState) {
+        val points = if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraPath.isNotEmpty()) {
+            state.dijkstraPath
+        } else {
+            state.routePoints
+        }
+        val totalStops = points.size
+        val totalDistanceKm = calculateRouteDistanceKm(points)
+        val estimatedMinutes = (totalDistanceKm / 0.28f).roundToInt().coerceAtLeast(1)
+        routeDistanceText?.text = String.format("%.1f km", totalDistanceKm)
+        routeTimeText?.text = "${estimatedMinutes} min"
+        routeStopsText?.text = totalStops.toString()
+    }
+
+    private fun calculateRouteDistanceKm(points: List<LatLng>): Float {
+        if (points.size < 2) return 0f
+        val result = FloatArray(1)
+        var meters = 0f
+        for (index in 0 until points.lastIndex) {
+            val current = points[index]
+            val next = points[index + 1]
+            Location.distanceBetween(current.latitude, current.longitude, next.latitude, next.longitude, result)
+            meters += result[0]
+        }
+        return meters / 1000f
+    }
+
     private fun renderRouteOnMap(points: List<LatLng>, stops: List<Pair<LatLng, String>>) {
+        mapLoadingOverlay?.visibility = View.GONE
         val routeJson = JSONArray().apply {
             points.forEach { p ->
                 put(JSONObject().apply {
@@ -277,6 +381,7 @@ class RoutesFragment : Fragment() {
     }
 
     private fun renderDijkstraOnMap(path: List<LatLng>) {
+        mapLoadingOverlay?.visibility = View.GONE
         val pathJson = JSONArray().apply {
             path.forEach { p ->
                 put(JSONObject().apply {
@@ -316,6 +421,7 @@ class RoutesFragment : Fragment() {
     }
 
     private fun setupLeafletMap(webView: WebView) {
+        mapLoadingOverlay?.visibility = View.VISIBLE
         webView.settings.javaScriptEnabled = true
         webView.settings.domStorageEnabled = true
         webView.webViewClient = object : WebViewClient() {
@@ -339,6 +445,28 @@ class RoutesFragment : Fragment() {
     private fun evalLeafletJs(script: String) {
         if (!isLeafletReady) return
         routeMapWebView?.evaluateJavascript(script, null)
+    }
+
+    private fun enableParentScrollLockWhileTouching(mapView: View) {
+        mapView.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN,
+                MotionEvent.ACTION_MOVE -> view.parent?.requestDisallowInterceptTouchEvent(true)
+
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_CANCEL -> view.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+            false
+        }
+    }
+
+    private fun focusOnUserLocation() {
+        if (userLocation == null) {
+            ensureLocationAndFetch()
+            return
+        }
+        evalLeafletJs("window.recenterMap();")
     }
 
     override fun onDestroyView() {

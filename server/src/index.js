@@ -172,12 +172,64 @@ async function fetchDbFromGitHub(gh) {
   }
 }
 
+// ===== Automatic Migration: Convert stopTimes to Schedules (one-time on startup) =====
+function migrateStopTimesToSchedules() {
+  const db = readDb();
+  let changed = false;
+
+  Object.values(db.colleges).forEach(college => {
+    if (!college.schedules) college.schedules = [];
+    if (!college.requests) college.requests = [];
+
+    // For each route with stopTimes, generate schedules
+    (college.routes || []).forEach(route => {
+      if (route.stopTimes && Object.keys(route.stopTimes).length > 0) {
+        // Convert each stop time into a schedule entry
+        // Default: assume a single departure per day for the route, using the earliest stop time
+        const times = Object.values(route.stopTimes).filter(t => typeof t === 'string');
+        if (times.length > 0) {
+          times.sort();
+          const firstTime = times[0]; // Earliest stop time becomes the departure time
+          
+          // Find the bus assigned to this route (if any)
+          const bus = (college.buses || []).find(b => b.routeId === route.id);
+          if (bus) {
+            const scheduleId = nanoid(8);
+            const schedule = {
+              id: scheduleId,
+              routeId: route.id,
+              busId: bus.id,
+              departureTime: firstTime,
+              activeDays: ['MON', 'TUE', 'WED', 'THU', 'FRI'] // Default weekdays
+            };
+            college.schedules.push(schedule);
+            changed = true;
+            console.log(`[Migration] Converted route ${route.id} stopTimes to schedule ${scheduleId} (departure: ${firstTime})`);
+          }
+        }
+        // After conversion, remove stopTimes (single system only)
+        delete route.stopTimes;
+        changed = true;
+      }
+    });
+  });
+
+  // Persist if migration occurred
+  if (changed) {
+    console.log('[Migration] Data structure updated. Persisting changes.');
+    writeDb(db);
+  }
+}
+
+// Run migration on startup
+migrateStopTimesToSchedules();
+
 // Create or update college meta
 app.post('/api/colleges', (req, res) => {
   const { code, name } = req.body;
   if (!code) return res.status(400).json({ error: 'code required' });
   const db = readDb();
-  db.colleges[code] = db.colleges[code] || { code, name: name || code, stops: [], routes: [], buses: [] };
+  db.colleges[code] = db.colleges[code] || { code, name: name || code, stops: [], routes: [], buses: [], schedules: [], requests: [] };
   if (name) db.colleges[code].name = name;
   writeDb(db);
   res.json(db.colleges[code]);
@@ -328,6 +380,175 @@ app.get('/api/colleges/:code/route-to-stop', async (req, res) => {
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
+});
+
+// ===== On-Demand Booking Requests =====
+
+// Submit a new on-demand request
+app.post('/api/colleges/:code/requests', (req, res) => {
+  const code = req.params.code;
+  const { route, pickupLat, pickupLng, destination, dateTime, passengers, purpose, roundTrip } = req.body;
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const requestId = nanoid(8);
+  const request = {
+    id: requestId,
+    route,
+    pickupLat,
+    pickupLng,
+    destination,
+    dateTime,
+    passengers,
+    purpose,
+    roundTrip: roundTrip || false,
+    status: 'PENDING',
+    createdAt: new Date().toISOString(),
+    lastUpdated: new Date().toISOString()
+  };
+  
+  if (!college.requests) college.requests = [];
+  college.requests.push(request);
+  writeDb(db);
+  res.json(request);
+});
+
+// Get all requests for a college
+app.get('/api/colleges/:code/requests', (req, res) => {
+  const code = req.params.code;
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  res.json({ requests: college.requests || [] });
+});
+
+// Get a specific request
+app.get('/api/colleges/:code/requests/:requestId', (req, res) => {
+  const code = req.params.code;
+  const requestId = req.params.requestId;
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  const request = (college.requests || []).find(r => r.id === requestId);
+  if (!request) return res.status(404).json({ error: 'request not found' });
+  res.json(request);
+});
+
+// Update request status (approve/reject)
+app.patch('/api/colleges/:code/requests/:requestId', (req, res) => {
+  const code = req.params.code;
+  const requestId = req.params.requestId;
+  const { status } = req.body; // PENDING, APPROVED, REJECTED
+  
+  if (!['PENDING', 'APPROVED', 'REJECTED'].includes(status)) {
+    return res.status(400).json({ error: 'invalid status' });
+  }
+  
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const request = (college.requests || []).find(r => r.id === requestId);
+  if (!request) return res.status(404).json({ error: 'request not found' });
+  
+  request.status = status;
+  request.lastUpdated = new Date().toISOString();
+  writeDb(db);
+  res.json(request);
+});
+
+// ===== Bus Schedules (Departure-based) =====
+
+// Get all schedules for a college
+app.get('/api/colleges/:code/schedules', (req, res) => {
+  const code = req.params.code;
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  res.json({ schedules: college.schedules || [] });
+});
+
+// Create a new schedule (departure time for a bus on a route)
+app.post('/api/colleges/:code/schedules', (req, res) => {
+  const code = req.params.code;
+  const { routeId, busId, departureTime, activeDays } = req.body;
+  
+  if (!routeId || !busId || !departureTime) {
+    return res.status(400).json({ error: 'routeId, busId, departureTime required' });
+  }
+  
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const route = (college.routes || []).find(r => r.id === routeId);
+  if (!route) return res.status(404).json({ error: 'route not found' });
+  
+  const bus = (college.buses || []).find(b => b.id === busId);
+  if (!bus) return res.status(404).json({ error: 'bus not found' });
+  
+  const schedule = {
+    id: nanoid(8),
+    routeId,
+    busId,
+    departureTime,
+    activeDays: activeDays || ['MON', 'TUE', 'WED', 'THU', 'FRI']
+  };
+  
+  if (!college.schedules) college.schedules = [];
+  college.schedules.push(schedule);
+  writeDb(db);
+  res.json(schedule);
+});
+
+// Update a schedule
+app.patch('/api/colleges/:code/schedules/:scheduleId', (req, res) => {
+  const code = req.params.code;
+  const scheduleId = req.params.scheduleId;
+  const { routeId, busId, departureTime, activeDays } = req.body;
+  
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const schedule = (college.schedules || []).find(s => s.id === scheduleId);
+  if (!schedule) return res.status(404).json({ error: 'schedule not found' });
+  
+  if (routeId && routeId !== schedule.routeId) {
+    const route = (college.routes || []).find(r => r.id === routeId);
+    if (!route) return res.status(404).json({ error: 'route not found' });
+    schedule.routeId = routeId;
+  }
+  
+  if (busId && busId !== schedule.busId) {
+    const bus = (college.buses || []).find(b => b.id === busId);
+    if (!bus) return res.status(404).json({ error: 'bus not found' });
+    schedule.busId = busId;
+  }
+  
+  if (departureTime) schedule.departureTime = departureTime;
+  if (activeDays) schedule.activeDays = activeDays;
+  
+  writeDb(db);
+  res.json(schedule);
+});
+
+// Delete a schedule
+app.delete('/api/colleges/:code/schedules/:scheduleId', (req, res) => {
+  const code = req.params.code;
+  const scheduleId = req.params.scheduleId;
+  
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const idx = (college.schedules || []).findIndex(s => s.id === scheduleId);
+  if (idx < 0) return res.status(404).json({ error: 'schedule not found' });
+  
+  college.schedules.splice(idx, 1);
+  writeDb(db);
+  res.json({ ok: true });
 });
 
 // Serve Admin Dashboard statically at root if available

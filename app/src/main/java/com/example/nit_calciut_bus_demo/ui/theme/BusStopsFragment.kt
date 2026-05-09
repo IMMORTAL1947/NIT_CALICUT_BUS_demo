@@ -1,36 +1,74 @@
 package com.example.nit_calciut_bus_demo.ui.theme
 
 import android.animation.ValueAnimator
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.nit_calciut_bus_demo.R
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.roundToInt
 
 class BusStopsFragment : Fragment() {
 
-    private lateinit var stopsMap: GoogleMap
+    private lateinit var stopPreviewMap: GoogleMap
     private lateinit var liveMap: GoogleMap
-    private val liveMarkers: MutableMap<String, Marker> = mutableMapOf()
+    private val liveBusPoints: MutableList<LiveBusPoint> = mutableListOf()
     private var livePollingThread: Thread? = null
     private var userLocation: Location? = null
 
-    private val stopItems: MutableList<Pair<String, LatLng>> = mutableListOf()
-    private val busMeta: MutableMap<String, Pair<String, String>> = mutableMapOf() // busId -> (busName, routeId)
-    private val busLastTs: MutableMap<String, Long> = mutableMapOf()
+    private var allStops: List<Stop> = emptyList()
+    private var allRoutes: List<Route> = emptyList()
+    private var allBuses: List<Bus> = emptyList()
+    private var selectedFilter: BusFilter = BusFilter.ALL
+
+    private lateinit var stopNameText: TextView
+    private lateinit var liveStatusText: TextView
+    private lateinit var locationButton: MaterialButton
+    private lateinit var filterChips: ChipGroup
 
     companion object {}
+
+    private enum class BusFilter {
+        ALL,
+        NEARBY,
+        FAVORITES,
+        MY_ROUTES
+    }
+
+    private data class LiveBusPoint(
+        val busId: String,
+        val busName: String,
+        val routeId: String?,
+        val position: LatLng,
+        val updatedAt: Long
+    )
+
+    private data class BusCluster(
+        val center: LatLng,
+        val buses: List<LiveBusPoint>
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,61 +80,104 @@ class BusStopsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        stopNameText = view.findViewById(R.id.stopNameText)
+        liveStatusText = view.findViewById(R.id.liveStatusText)
+        locationButton = view.findViewById(R.id.locationButton)
+        filterChips = view.findViewById(R.id.busFilterChips)
+
+        locationButton.setOnClickListener { focusOnUserLocation() }
+
+        setupFilterChips()
+
         val fused = LocationServices.getFusedLocationProviderClient(requireContext())
         fused.lastLocation.addOnSuccessListener { loc ->
             if (loc != null) {
                 userLocation = loc
+                refreshStopCard()
+                renderPreviewStop()
+                renderLiveMarkers()
             }
         }
 
-        val stopsFrag = childFragmentManager.findFragmentById(R.id.stopsMap) as SupportMapFragment
-        stopsFrag.getMapAsync { map ->
-            stopsMap = map
-            configureMapUi(stopsMap)
-            loadAndRenderStops()
+        val previewFrag = childFragmentManager.findFragmentById(R.id.stopPreviewMap) as SupportMapFragment
+        previewFrag.view?.let { enableParentScrollLockWhileTouching(it) }
+        previewFrag.getMapAsync { map ->
+            stopPreviewMap = map
+            configureMapUi(stopPreviewMap, preview = true)
+            renderPreviewStop()
         }
 
         val liveFrag = childFragmentManager.findFragmentById(R.id.liveMap) as SupportMapFragment
+        liveFrag.view?.let { enableParentScrollLockWhileTouching(it) }
         liveFrag.getMapAsync { map ->
             liveMap = map
-            configureMapUi(liveMap)
+            configureMapUi(liveMap, preview = false)
+            liveMap.setOnCameraIdleListener { renderLiveMarkers() }
             startLivePolling()
         }
+
+        // Attach touch overlays (transparent Views placed above the fragment content)
+        // Wire overlays to forward touches to the underlying map view while still
+        // preventing the parent NestedScrollView from intercepting during gestures.
+        view.findViewById<View?>(R.id.stopPreviewTouchOverlay)?.let { overlay ->
+            wireOverlayToMap(overlay, R.id.stopPreviewMap)
+        }
+        view.findViewById<View?>(R.id.liveMapTouchOverlay)?.let { overlay ->
+            wireOverlayToMap(overlay, R.id.liveMap)
+        }
+
+        loadAndRenderStops()
     }
 
-    private fun configureMapUi(map: GoogleMap) {
+    private fun setupFilterChips() {
+        val chips = listOf(
+            R.id.chipAllBuses,
+            R.id.chipNearby,
+            R.id.chipFavorites,
+            R.id.chipMyRoutes
+        )
+        chips.forEach { id ->
+            filterChips.findViewById<Chip>(id)?.setOnClickListener {
+                selectedFilter = when (id) {
+                    R.id.chipNearby -> BusFilter.NEARBY
+                    R.id.chipFavorites -> BusFilter.FAVORITES
+                    R.id.chipMyRoutes -> BusFilter.MY_ROUTES
+                    else -> BusFilter.ALL
+                }
+                renderLiveMarkers()
+            }
+        }
+        filterChips.check(R.id.chipAllBuses)
+    }
+
+    private fun configureMapUi(map: GoogleMap, preview: Boolean) {
         map.uiSettings.apply {
-            isZoomControlsEnabled = true
-            isMapToolbarEnabled = true
-            isCompassEnabled = true
+            isZoomControlsEnabled = false
+            isMapToolbarEnabled = false
+            isCompassEnabled = !preview
+            isTiltGesturesEnabled = !preview
+            isRotateGesturesEnabled = !preview
+            isScrollGesturesEnabled = true
+            isScrollGesturesEnabledDuringRotateOrZoom = true
+        }
+        runCatching {
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.bus_map_style))
         }
         map.setOnMarkerClickListener { marker ->
             marker.showInfoWindow()
             true
         }
+        if (preview) {
+            map.setOnCameraMoveListener {
+                true
+            }
+        }
     }
 
-    private fun addBusStopMarkers(stops: List<Pair<LatLng, String>>) {
-        val stopIcon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
-
-        val boundsBuilder = LatLngBounds.Builder()
-        stops.forEach { (position, title) ->
-            stopsMap.addMarker(
-                MarkerOptions()
-                    .position(position)
-                    .title(title)
-                    .icon(stopIcon)
-                    .anchor(0.5f, 0.5f)
-            )
-            boundsBuilder.include(position)
-        }
-        if (stops.isNotEmpty()) {
-            val bounds = boundsBuilder.build()
-            val padding = 100
-            stopsMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding))
-        }
-        stopItems.clear()
-        stops.forEach { (pos, name) -> stopItems.add(Pair(name, pos)) }
+    private fun addBusStopMarkers(stops: List<Stop>) {
+        allStops = stops
+        renderPreviewStop()
+        refreshStopCard()
     }
 
     private fun loadAndRenderStops() {
@@ -119,22 +200,42 @@ class BusStopsFragment : Fragment() {
                     val response = conn.inputStream.bufferedReader().use { it.readText() }
                     val json = org.json.JSONObject(response)
                     val stopsJson = json.getJSONArray("stops")
-                    val stopsList = mutableListOf<Pair<LatLng, String>>()
+                    val stopsList = mutableListOf<Stop>()
                     for (i in 0 until stopsJson.length()) {
                         val s = stopsJson.getJSONObject(i)
                         val lat = s.getDouble("lat")
                         val lng = s.getDouble("lng")
                         val name = s.getString("name")
-                        stopsList.add(Pair(LatLng(lat, lng), name))
+                        val id = s.optString("id", name)
+                        stopsList.add(Stop(id, name, lat, lng))
                     }
-                    busMeta.clear()
+                    val routesJson = json.optJSONArray("routes") ?: org.json.JSONArray()
+                    val routesList = mutableListOf<Route>()
+                    for (i in 0 until routesJson.length()) {
+                        val r = routesJson.getJSONObject(i)
+                        val stopIdsJson = r.optJSONArray("stopIds") ?: org.json.JSONArray()
+                        val stopIds = mutableListOf<String>()
+                        for (j in 0 until stopIdsJson.length()) {
+                            stopIds.add(stopIdsJson.getString(j))
+                        }
+                        routesList.add(
+                            Route(
+                                id = r.getString("id"),
+                                name = r.optString("name", r.getString("id")),
+                                color = r.optString("color", "#6750A4"),
+                                stopIds = stopIds
+                            )
+                        )
+                    }
+
+                    val busesList = mutableListOf<Bus>()
                     val busesJson = json.optJSONArray("buses") ?: org.json.JSONArray()
                     for (i in 0 until busesJson.length()) {
                         val b = busesJson.getJSONObject(i)
                         val id = b.getString("id")
                         val name = b.getString("name")
                         val routeId = b.optString("routeId", "")
-                        busMeta[id] = Pair(name, routeId)
+                        busesList.add(Bus(id = id, name = name, routeId = routeId.ifBlank { null }))
                     }
                     requireActivity().runOnUiThread {
                         if (stopsList.isNotEmpty()) {
@@ -143,6 +244,11 @@ class BusStopsFragment : Fragment() {
                             Log.w("BusStops", "No stops in config")
                             Toast.makeText(requireContext(), "No stops found for $code", Toast.LENGTH_SHORT).show()
                         }
+                        allRoutes = routesList
+                        allBuses = busesList
+                        refreshStopCard()
+                        renderPreviewStop()
+                        renderLiveMarkers()
                     }
                 } else {
                     Log.e("BusStops", "Config fetch failed: ${conn.responseCode}")
@@ -176,20 +282,29 @@ class BusStopsFragment : Fragment() {
                         val response = conn.inputStream.bufferedReader().use { it.readText() }
                         val json = org.json.JSONObject(response)
                         val arr = json.getJSONArray("buses")
-                        val positions = mutableListOf<Triple<String, Double, Double>>()
+                        val positions = mutableListOf<LiveBusPoint>()
                         for (i in 0 until arr.length()) {
                             val o = arr.getJSONObject(i)
                             val id = o.getString("busId")
-                            positions.add(Triple(id, o.getDouble("lat"), o.getDouble("lng")))
-                            val ts = o.optLong("ts", System.currentTimeMillis())
-                            busLastTs[id] = ts
+                            val bus = allBuses.firstOrNull { it.id == id }
+                            positions.add(
+                                LiveBusPoint(
+                                    busId = id,
+                                    busName = bus?.name ?: id,
+                                    routeId = bus?.routeId,
+                                    position = LatLng(o.getDouble("lat"), o.getDouble("lng")),
+                                    updatedAt = o.optLong("ts", System.currentTimeMillis())
+                                )
+                            )
                         }
                         requireActivity().runOnUiThread {
-                            updateLiveMarkers(positions)
+                            liveBusPoints.clear()
+                            liveBusPoints.addAll(positions)
+                            renderLiveMarkers()
                         }
                     }
                     conn.disconnect()
-                    Thread.sleep(5000)
+                    Thread.sleep(15000)
                 }
             } catch (_: InterruptedException) {
             } catch (e: Exception) {
@@ -197,20 +312,6 @@ class BusStopsFragment : Fragment() {
             }
         }
         livePollingThread!!.start()
-    }
-
-    private fun updateLiveMarkers(positions: List<Triple<String, Double, Double>>) {
-        val icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
-        for ((busId, lat, lng) in positions) {
-            val pos = LatLng(lat, lng)
-            val existing = liveMarkers[busId]
-            if (existing != null) {
-                animateMarkerTo(existing, pos)
-            } else {
-                val marker = liveMap.addMarker(MarkerOptions().position(pos).icon(icon).title("Bus: $busId"))
-                if (marker != null) liveMarkers[busId] = marker
-            }
-        }
     }
 
     private fun animateMarkerTo(marker: Marker, toPos: LatLng) {
@@ -226,15 +327,208 @@ class BusStopsFragment : Fragment() {
         animator.start()
     }
 
+    private fun renderPreviewStop() {
+        if (!::stopPreviewMap.isInitialized || allStops.isEmpty()) return
+        val stop = currentStop() ?: allStops.firstOrNull() ?: return
+        stopPreviewMap.clear()
+        
+        val nearbyStops = allStops.filter {
+            distanceMeters(stop.lat, stop.lng, it.lat, it.lng) <= 800f
+        }.take(5)
+        
+        val boundsBuilder = LatLngBounds.Builder()
+        nearbyStops.forEach { s ->
+            val markerColor = if (s.id == stop.id) BitmapDescriptorFactory.HUE_VIOLET else BitmapDescriptorFactory.HUE_ROSE
+            stopPreviewMap.addMarker(
+                MarkerOptions()
+                    .position(LatLng(s.lat, s.lng))
+                    .title(s.name)
+                    .icon(BitmapDescriptorFactory.defaultMarker(markerColor))
+            )
+            boundsBuilder.include(LatLng(s.lat, s.lng))
+        }
+        
+        stopPreviewMap.addCircle(
+            CircleOptions()
+                .center(LatLng(stop.lat, stop.lng))
+                .radius(800.0)
+                .strokeColor(Color.parseColor("#8663E6"))
+                .fillColor(Color.parseColor("#338663E6"))
+                .strokeWidth(2f)
+        )
+        
+        runCatching {
+            val bounds = boundsBuilder.build()
+            stopPreviewMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        }
+    }
+
+    private fun refreshStopCard() {
+    }
+
+
+
+    private fun renderLiveMarkers() {
+        if (!::liveMap.isInitialized) return
+        val filteredPoints = filteredLivePoints()
+        liveMap.clear()
+
+        if (filteredPoints.isEmpty()) {
+            val fallbackStop = currentStop()
+            if (fallbackStop != null) {
+                liveMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(fallbackStop.lat, fallbackStop.lng))
+                        .title("No live buses yet")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE))
+                )
+            }
+            return
+        }
+
+        val clusters = clusterLivePoints(filteredPoints, liveMap.cameraPosition.zoom)
+        val boundsBuilder = LatLngBounds.Builder()
+        clusters.forEach { cluster ->
+            boundsBuilder.include(cluster.center)
+            if (cluster.buses.size == 1) {
+                val bus = cluster.buses.first()
+                liveMap.addMarker(
+                    MarkerOptions()
+                        .position(cluster.center)
+                        .title(bus.busName)
+                        .snippet(routeLabel(bus.routeId))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                )
+            } else {
+                liveMap.addMarker(
+                    MarkerOptions()
+                        .position(cluster.center)
+                        .title("${cluster.buses.size} buses")
+                        .snippet(cluster.buses.take(3).joinToString { it.busName })
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA))
+                )
+            }
+        }
+
+        runCatching {
+            if (clusters.size == 1) {
+                liveMap.animateCamera(CameraUpdateFactory.newLatLngZoom(clusters.first().center, max(15f, liveMap.cameraPosition.zoom)))
+            } else {
+                liveMap.animateCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 120))
+            }
+        }
+    }
+
+    private fun filteredLivePoints(): List<LiveBusPoint> {
+        return when (selectedFilter) {
+            BusFilter.ALL -> liveBusPoints
+            BusFilter.NEARBY -> {
+                val loc = userLocation ?: return liveBusPoints
+                liveBusPoints.filter {
+                    distanceMeters(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude) <= 1200f
+                }
+            }
+            BusFilter.FAVORITES -> liveBusPoints.sortedBy { it.busName }.take(max(1, liveBusPoints.size.coerceAtMost(4)))
+            BusFilter.MY_ROUTES -> {
+                val stop = currentStop() ?: return liveBusPoints
+                val routeIds = allRoutes.filter { it.stopIds.contains(stop.id) }.map { it.id }.toSet()
+                if (routeIds.isEmpty()) liveBusPoints else liveBusPoints.filter { it.routeId in routeIds }
+            }
+        }
+    }
+
+    private fun clusterLivePoints(points: List<LiveBusPoint>, zoom: Float): List<BusCluster> {
+        val bucket = when {
+            zoom < 12f -> 0.01
+            zoom < 14f -> 0.005
+            zoom < 16f -> 0.002
+            else -> 0.0007
+        }
+        return points.groupBy {
+            val latBucket = floor(it.position.latitude / bucket).toInt()
+            val lngBucket = floor(it.position.longitude / bucket).toInt()
+            "$latBucket:$lngBucket"
+        }.values.map { group ->
+            val center = LatLng(
+                group.map { it.position.latitude }.average(),
+                group.map { it.position.longitude }.average()
+            )
+            BusCluster(center, group)
+        }
+    }
+
+    private fun currentStop(): Stop? {
+        if (allStops.isEmpty()) return null
+        val loc = userLocation
+        if (loc == null) return allStops.firstOrNull()
+        return allStops.minByOrNull { stop ->
+            distanceMeters(loc.latitude, loc.longitude, stop.lat, stop.lng)
+        }
+    }
+
+    private fun distanceLabel(stop: Stop): String {
+        val loc = userLocation ?: return "Nearby stop • ${stop.lat}, ${stop.lng}"
+        val meters = distanceMeters(loc.latitude, loc.longitude, stop.lat, stop.lng).roundToInt()
+        val walkMinutes = max(1, ceil(meters / 75.0).toInt())
+        return "$walkMinutes min walk • ${meters}m"
+    }
+
+    private fun enableParentScrollLockWhileTouching(mapView: View) {
+        mapView.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN,
+                MotionEvent.ACTION_MOVE -> view.parent?.requestDisallowInterceptTouchEvent(true)
+
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_CANCEL -> view.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+            false
+        }
+    }
+
+    private fun wireOverlayToMap(overlay: View, mapFragmentId: Int) {
+        val mapView = childFragmentManager.findFragmentById(mapFragmentId)?.view
+        overlay.setOnTouchListener { v, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN,
+                MotionEvent.ACTION_POINTER_DOWN,
+                MotionEvent.ACTION_MOVE -> v.parent?.requestDisallowInterceptTouchEvent(true)
+
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_CANCEL,
+                MotionEvent.ACTION_POINTER_UP -> v.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+            // Forward the event to the underlying map view so the map handles gestures.
+            // If mapView is null, return false to allow normal propagation.
+            return@setOnTouchListener (mapView?.dispatchTouchEvent(event) ?: false)
+        }
+    }
+
+    private fun routeLabel(routeId: String?): String {
+        if (routeId.isNullOrBlank()) return "Live on campus route"
+        return allRoutes.firstOrNull { it.id == routeId }?.name ?: routeId
+    }
+
+    private fun focusOnUserLocation() {
+        val loc = userLocation
+        if (loc == null) {
+            Toast.makeText(requireContext(), "Location unavailable yet", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val latLng = LatLng(loc.latitude, loc.longitude)
+        if (::stopPreviewMap.isInitialized) {
+            stopPreviewMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+        }
+        if (::liveMap.isInitialized) {
+            liveMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16f))
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         livePollingThread?.interrupt()
         livePollingThread = null
-    }
-
-    private fun getScaledBusIcon(dpSize: Int = 28): BitmapDescriptor {
-        // Fallback to default marker to avoid missing drawable resource
-        return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)
     }
 
     private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
