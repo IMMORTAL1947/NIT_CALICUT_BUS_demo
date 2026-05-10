@@ -193,6 +193,77 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
+        <!-- Crowd Status Widget -->
+        <LinearLayout
+            android:id="@+id/crowdStatusContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:background="#F5F5F5"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/crowdLevelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🟢 Low Rush"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="#ddd" />
+
+                <TextView
+                    android:id="@+id/crowdPeopleText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="15 passengers"
+                    android:textSize="14sp"
+                    android:textColor="#666" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="8dp">
+
+                <ProgressBar
+                    android:id="@+id/crowdProgressBar"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="8dp"
+                    android:layout_weight="1"
+                    android:progress="35"
+                    android:max="100"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/crowdPercentText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="35% Full"
+                    android:textSize="12sp"
+                    android:textColor="#666"
+                    android:minWidth="50dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -300,42 +371,18 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/distanceValueText"
+                        android:id="@+id/rushIndicatorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5.2 km"
-                        android:textColor="@color/bus_on_surface"
+                        android:text="🟢 Low Rush"
+                        android:textColor="#4CAF50"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Distance"
-                        android:textColor="@color/bus_on_surface_variant"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/timeValueText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12 min"
-                        android:textColor="@color/bus_on_surface"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Estimated Time"
+                        android:text="Current Rush"
                         android:textColor="@color/bus_on_surface_variant"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -351,7 +398,7 @@
                         android:id="@+id/stopsCountText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5"
+                        android:text="12"
                         android:textColor="@color/bus_on_surface"
                         android:textSize="18sp"
                         android:textStyle="bold" />

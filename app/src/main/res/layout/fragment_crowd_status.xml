@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:id="@+id/crowdContainer"
+    android:background="#f5f5f5"
+    android:layout_margin="8dp"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/crowdLevelText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🟢 Low Rush"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#4CAF50" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="#ddd" />
+
+        <TextView
+            android:id="@+id/crowdPeopleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15 passengers"
+            android:textSize="14sp"
+            android:textColor="#666" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:spacing="8dp">
+
+        <ProgressBar
+            android:id="@+id/crowdProgressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            android:layout_weight="1"
+            android:progress="35"
+            android:max="100"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/crowdPercentText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="35% Full"
+            android:textSize="12sp"
+            android:textColor="#666"
+            android:minWidth="50dp" />
+    </LinearLayout>
+
+</LinearLayout>

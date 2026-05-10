@@ -146,27 +146,47 @@
           "id": "bus1",
           "name": "BUS1",
           "routeId": "SOMS",
-          "driverToken": "70oxMJNCPBRvcVtGl-4QFS6Z"
+          "driverToken": "70oxMJNCPBRvcVtGl-4QFS6Z",
+          "crowdApiUrl": "https://crowd-backend-dq8j.onrender.com/rush_count",
+          "busCapacity": 40,
+          "pollingEnabled": true,
+          "pollingInterval": 10
         },
         {
           "id": "newmbh",
           "name": "NEWMBH",
-          "routeId": "newmbh"
+          "routeId": "newmbh",
+          "crowdApiUrl": "",
+          "busCapacity": 40,
+          "pollingEnabled": true,
+          "pollingInterval": 10
         },
         {
           "id": "bus2",
           "name": "BUS2",
-          "routeId": "LH"
+          "routeId": "LH",
+          "crowdApiUrl": "",
+          "busCapacity": 40,
+          "pollingEnabled": true,
+          "pollingInterval": 10
         },
         {
           "id": "bus3",
           "name": "BUS3",
-          "routeId": "NEWMBH"
+          "routeId": "NEWMBH",
+          "crowdApiUrl": "",
+          "busCapacity": 40,
+          "pollingEnabled": true,
+          "pollingInterval": 10
         },
         {
           "id": "bus4",
           "name": "BUS4",
-          "routeId": "NEWMBH"
+          "routeId": "NEWMBH",
+          "crowdApiUrl": "",
+          "busCapacity": 40,
+          "pollingEnabled": true,
+          "pollingInterval": 10
         }
       ],
       "schedules": [

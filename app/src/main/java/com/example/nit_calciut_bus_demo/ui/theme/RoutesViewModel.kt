@@ -44,7 +44,11 @@ data class RouteUiState(
     val loading: Boolean,
     val error: String?
     ,
-    val directionReversed: Boolean = false
+    val directionReversed: Boolean = false,
+    val crowdLevel: String? = null,    // LOW, MEDIUM, HIGH, FULL, UNAVAILABLE
+    val crowdColor: String? = null,    // hex color
+    val crowdPercent: Int = 0,         // 0-100 occupancy
+    val crowdPeopleCount: Int = 0      // actual people count
 )
 
 class RoutesViewModel : ViewModel() {
@@ -69,6 +73,12 @@ class RoutesViewModel : ViewModel() {
     private var currentBusLatLng: LatLng? = null
     private var pollingThread: Thread? = null
     private var userLocation: Location? = null
+    // Crowd monitoring state
+    private var crowdLevel: String? = null
+    private var crowdColor: String? = null
+    private var crowdPercent: Int = 0
+    private var crowdPeopleCount: Int = 0
+    private var crowdPollingThread: Thread? = null
     private var routingMode: RoutingMode = RoutingMode.GOOGLE
     private var dijkstraPath: List<LatLng> = emptyList()
     private var dijkstraSteps: List<String> = emptyList()
@@ -118,6 +128,11 @@ class RoutesViewModel : ViewModel() {
         selectedBusIndex = index.coerceIn(0, busOptions.lastIndex)
         // Recompute route points and stop states for selected bus
         recomputeRouteForSelectedBus()
+        // Start crowd polling for this bus
+        val busId = busOptions.getOrNull(selectedBusIndex)?.first
+        if (!busId.isNullOrEmpty()) {
+            startCrowdPolling(busId)
+        }
         publishUi()
     }
 
@@ -200,11 +215,11 @@ class RoutesViewModel : ViewModel() {
         }
         val routesArr = json.getJSONArray("routes")
         var chosenRoute: JSONObject? = null
-        // Only match routes where the ID explicitly matches the bus's routeId
+        // Only match routes where the ID explicitly matches the bus's routeId (case-insensitive)
         if (routeId != null) {
             for (i in 0 until routesArr.length()) {
                 val r = routesArr.getJSONObject(i)
-                if (r.getString("id") == routeId) {
+                if (r.getString("id").lowercase() == routeId.lowercase()) {
                     chosenRoute = r
                     break
                 }
@@ -271,8 +286,12 @@ class RoutesViewModel : ViewModel() {
                 dijkstraPath = dijkstraPath,
                 dijkstraSteps = dijkstraSteps,
                 loading = loading,
-                    error = error,
-                    directionReversed = directionReversed
+                error = error,
+                directionReversed = directionReversed,
+                crowdLevel = crowdLevel,
+                crowdColor = crowdColor,
+                crowdPercent = crowdPercent,
+                crowdPeopleCount = crowdPeopleCount
             )
         )
     }
@@ -542,6 +561,71 @@ class RoutesViewModel : ViewModel() {
         super.onCleared()
         pollingThread?.interrupt()
         pollingThread = null
+        crowdPollingThread?.interrupt()
+        crowdPollingThread = null
+    }
+
+    private fun startCrowdPolling(busId: String) {
+        // Cancel previous crowd polling thread if any
+        crowdPollingThread?.interrupt()
+        crowdPollingThread = null
+        
+        if (busId.isEmpty()) {
+            crowdLevel = null
+            crowdColor = null
+            crowdPercent = 0
+            crowdPeopleCount = 0
+            publishUi()
+            return
+        }
+        
+        crowdPollingThread = Thread {
+            try {
+                while (true) {
+                    val ctx = appContext ?: return@Thread
+                    val baseUrl = AppPrefs.getServerUrl(ctx).trimEnd('/')
+                    val collegeCode = AppPrefs.getCollegeCode(ctx) ?: return@Thread
+                    
+                    try {
+                        val url = java.net.URL("${baseUrl}/api/crowd-status/${busId}")
+                        val conn = url.openConnection() as java.net.HttpURLConnection
+                        conn.requestMethod = "GET"
+                        conn.connectTimeout = 5000
+                        conn.readTimeout = 5000
+                        
+                        if (conn.responseCode == 200) {
+                            val response = conn.inputStream.bufferedReader().readText()
+                            val json = JSONObject(response)
+                            
+                            crowdLevel = json.optString("crowdLevel", "UNAVAILABLE")
+                            crowdColor = json.optString("color", "#CCCCCC")
+                            crowdPercent = json.optInt("occupancyPercent", 0)
+                            crowdPeopleCount = json.optInt("peopleCount", 0)
+                            publishUi()
+                        } else {
+                            crowdLevel = "UNAVAILABLE"
+                            crowdColor = "#CCCCCC"
+                            crowdPercent = 0
+                            crowdPeopleCount = 0
+                            publishUi()
+                        }
+                        conn.disconnect()
+                    } catch (e: Exception) {
+                        Log.e("RoutesVM", "Crowd fetch error: ${e.message}")
+                        crowdLevel = "UNAVAILABLE"
+                        crowdColor = "#CCCCCC"
+                        crowdPercent = 0
+                        crowdPeopleCount = 0
+                        publishUi()
+                    }
+                    
+                    // Poll every 10 seconds
+                    Thread.sleep(10000)
+                }
+            } catch (_: InterruptedException) {
+            }
+        }
+        crowdPollingThread!!.start()
     }
 }
 

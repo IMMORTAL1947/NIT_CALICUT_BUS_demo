@@ -174,6 +174,7 @@ async function loadCollege(code) {
     renderStopsList();
     renderRoutesList();
     renderBusesList();
+    renderCrowdConfigList();
     renderSchedulesList();
     updateScheduleDropdowns();
     $('status').textContent = `Loaded ${code}`;
@@ -543,6 +544,147 @@ $('saveBuses').onclick = async () => {
   const json = await res.json();
   $('status').textContent = `Saved bus settings for ${json.buses.length} bus(es).`;
 };
+
+// ===== Live Crowd Monitoring =====
+function renderCrowdConfigList() {
+  const ul = $('crowdConfigList');
+  if (!ul) return;
+  ul.innerHTML = '';
+  buses.forEach(b => {
+    const li = document.createElement('li');
+    li.style.border = '1px solid #ddd';
+    li.style.borderRadius = '4px';
+    li.style.padding = '12px';
+    li.style.marginBottom = '10px';
+    li.style.backgroundColor = '#f9f9f9';
+    
+    const h4 = document.createElement('h4');
+    h4.textContent = `${b.name} (${b.id})`;
+    h4.style.margin = '0 0 10px 0';
+    
+    const form = document.createElement('div');
+    form.style.display = 'grid';
+    form.style.gridTemplateColumns = '1fr 1fr';
+    form.style.gap = '10px';
+    
+    // API URL field
+    const apiLabel = document.createElement('label');
+    apiLabel.textContent = 'Crowd API URL:';
+    const apiInput = document.createElement('input');
+    apiInput.type = 'text';
+    apiInput.value = b.crowdApiUrl || '';
+    apiInput.placeholder = 'e.g. https://api.example.com/bus/id';
+    apiInput.style.gridColumn = '1 / -1';
+    apiInput.dataset.busId = b.id;
+    apiInput.className = 'crowdApiUrl';
+    
+    // Capacity field
+    const capLabel = document.createElement('label');
+    capLabel.textContent = 'Bus Capacity:';
+    const capInput = document.createElement('input');
+    capInput.type = 'number';
+    capInput.value = b.busCapacity || 40;
+    capInput.min = '1';
+    capInput.dataset.busId = b.id;
+    capInput.className = 'busCapacity';
+    
+    // Polling interval field
+    const intervalLabel = document.createElement('label');
+    intervalLabel.textContent = 'Poll Interval (seconds):';
+    const intervalInput = document.createElement('input');
+    intervalInput.type = 'number';
+    intervalInput.value = b.pollingInterval || 10;
+    intervalInput.min = '5';
+    intervalInput.max = '300';
+    intervalInput.dataset.busId = b.id;
+    intervalInput.className = 'pollingInterval';
+    
+    // Polling toggle
+    const toggleLabel = document.createElement('label');
+    toggleLabel.style.gridColumn = '1 / -1';
+    toggleLabel.style.display = 'flex';
+    toggleLabel.style.alignItems = 'center';
+    toggleLabel.style.gap = '8px';
+    const toggleCheckbox = document.createElement('input');
+    toggleCheckbox.type = 'checkbox';
+    toggleCheckbox.checked = b.pollingEnabled !== false;
+    toggleCheckbox.data = b.id;
+    toggleCheckbox.className = 'pollingEnabled';
+    toggleCheckbox.dataset.busId = b.id;
+    toggleLabel.appendChild(toggleCheckbox);
+    toggleLabel.appendChild(document.createTextNode('Enable Polling'));
+    
+    // Save button
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save Crowd Config';
+    saveBtn.style.gridColumn = '1 / -1';
+    saveBtn.style.backgroundColor = '#2196F3';
+    saveBtn.style.color = 'white';
+    saveBtn.style.border = 'none';
+    saveBtn.style.padding = '8px 16px';
+    saveBtn.style.borderRadius = '4px';
+    saveBtn.style.cursor = 'pointer';
+    saveBtn.className = 'saveCrowdConfig';
+    saveBtn.dataset.busId = b.id;
+    
+    form.appendChild(apiLabel);
+    form.appendChild(apiInput);
+    form.appendChild(capLabel);
+    form.appendChild(capInput);
+    form.appendChild(intervalLabel);
+    form.appendChild(intervalInput);
+    form.appendChild(toggleLabel);
+    form.appendChild(saveBtn);
+    
+    li.appendChild(h4);
+    li.appendChild(form);
+    ul.appendChild(li);
+  });
+  
+  // Attach event listeners
+  ul.querySelectorAll('.saveCrowdConfig').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const code = $('collegeCode').value.trim();
+      const busId = e.target.dataset.busId;
+      if (!code) return alert('Select college first');
+      
+      // Gather form data
+      const apiInput = ul.querySelector(`.crowdApiUrl[data-bus-id="${busId}"]`);
+      const capInput = ul.querySelector(`.busCapacity[data-bus-id="${busId}"]`);
+      const intervalInput = ul.querySelector(`.pollingInterval[data-bus-id="${busId}"]`);
+      const enabledCheckbox = ul.querySelector(`.pollingEnabled[data-bus-id="${busId}"]`);
+      
+      const payload = {
+        crowdApiUrl: apiInput?.value || '',
+        busCapacity: parseInt(capInput?.value) || 40,
+        pollingInterval: parseInt(intervalInput?.value) || 10,
+        pollingEnabled: enabledCheckbox?.checked !== false
+      };
+      
+      try {
+        const res = await fetch(`${API_BASE}/colleges/${code}/buses/${busId}/crowd-config`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json.ok) {
+          $('status').textContent = `Crowd config saved for ${busId}`;
+          // Update local bus data
+          const bus = buses.find(b => b.id === busId);
+          if (bus) {
+            Object.assign(bus, payload);
+          }
+        } else {
+          $('status').textContent = json.error || 'Save failed';
+        }
+      } catch (err) {
+        $('status').textContent = `Error: ${err.message}`;
+      }
+    });
+  });
+}
+
 // ===== On-Demand Booking Requests =====
 
 async function loadRequests() {

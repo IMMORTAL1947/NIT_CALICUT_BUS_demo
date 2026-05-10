@@ -78,8 +78,7 @@ class RoutesFragment : Fragment() {
         val directionSelector = view.findViewById<Spinner>(R.id.directionSelector)
         val routeTitle = view.findViewById<TextView>(R.id.routeTitle)
         val liveStatusText = view.findViewById<TextView>(R.id.liveStatusText)
-        routeDistanceText = view.findViewById(R.id.distanceValueText)
-        routeTimeText = view.findViewById(R.id.timeValueText)
+        val rushIndicatorText = view.findViewById<TextView>(R.id.rushIndicatorText)
         routeStopsText = view.findViewById(R.id.stopsCountText)
         mapLoadingOverlay = view.findViewById(R.id.mapLoadingOverlay)
         emptyStateText = view.findViewById(R.id.emptyStateText)
@@ -87,6 +86,13 @@ class RoutesFragment : Fragment() {
         val recenterButton = view.findViewById<View>(R.id.recenterButton)
         val zoomInButton = view.findViewById<View>(R.id.zoomInButton)
         val zoomOutButton = view.findViewById<View>(R.id.zoomOutButton)
+        
+        // Crowd status widgets
+        val crowdStatusContainer = view.findViewById<View>(R.id.crowdStatusContainer)
+        val crowdLevelText = view.findViewById<TextView>(R.id.crowdLevelText)
+        val crowdPeopleText = view.findViewById<TextView>(R.id.crowdPeopleText)
+        val crowdProgressBar = view.findViewById<android.widget.ProgressBar>(R.id.crowdProgressBar)
+        val crowdPercentText = view.findViewById<TextView>(R.id.crowdPercentText)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.stopsRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -220,7 +226,59 @@ class RoutesFragment : Fragment() {
                 renderRouteOnMap(state.routePoints, state.stopMarkers)
             }
             updateBusMarker(state.busLatLng)
-            updateRouteMetrics(state)
+            
+            // Update rush indicator and stops count
+            val rushIcon = when (state.crowdLevel) {
+                "LOW" -> "🟢"
+                "MEDIUM" -> "🟡"
+                "HIGH" -> "🔴"
+                "FULL" -> "🔴"
+                else -> "⚪"
+            }
+            rushIndicatorText.text = "$rushIcon ${state.crowdLevel ?: "Unknown"} Rush"
+            try {
+                val color = android.graphics.Color.parseColor(state.crowdColor ?: "#CCCCCC")
+                rushIndicatorText.setTextColor(color)
+            } catch (e: Exception) {
+                rushIndicatorText.setTextColor(android.graphics.Color.GRAY)
+            }
+            
+            // Show total stops
+            val totalStops = if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraPath.isNotEmpty()) {
+                state.dijkstraPath.size
+            } else {
+                state.routePoints.size
+            }
+            routeStopsText?.text = totalStops.toString()
+
+            // Update crowd status display
+            if (state.crowdLevel != null && state.crowdLevel != "UNAVAILABLE") {
+                crowdStatusContainer.visibility = View.VISIBLE
+                val icon = when (state.crowdLevel) {
+                    "LOW" -> "🟢"
+                    "MEDIUM" -> "🟡"
+                    "HIGH" -> "🔴"
+                    "FULL" -> "🔴"
+                    else -> "⚪"
+                }
+                crowdLevelText.text = "$icon ${state.crowdLevel} Rush"
+                crowdPeopleText.text = "${state.crowdPeopleCount} passengers"
+                crowdProgressBar.progress = state.crowdPercent
+                crowdPercentText.text = "${state.crowdPercent}% Full"
+                
+                try {
+                    val color = android.graphics.Color.parseColor(state.crowdColor ?: "#CCCCCC")
+                    crowdProgressBar.progressDrawable.setColorFilter(
+                        color,
+                        android.graphics.PorterDuff.Mode.SRC_IN
+                    )
+                    crowdLevelText.setTextColor(color)
+                } catch (e: Exception) {
+                    crowdLevelText.setTextColor(android.graphics.Color.GRAY)
+                }
+            } else {
+                crowdStatusContainer.visibility = View.GONE
+            }
 
             if (state.routingMode == RoutingMode.DIJKSTRA && state.dijkstraSteps.isNotEmpty()) {
                 stepsHeader.visibility = View.VISIBLE

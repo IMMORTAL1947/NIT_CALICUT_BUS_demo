@@ -617,6 +617,187 @@ app.get('/api/colleges/:code/live', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+// ===== CROWD MONITORING SERVICE =====
+const crowdState = {}; // Store crowd data: { busId: { peopleCount, crowdLevel, occupancyPercent, lastUpdated, apiStatus, lastError } }
+const crowdPollingThreads = {}; // Track polling threads per bus
+
+function normalizeCrowdLevel(peopleCount, busCapacity = 40) {
+  const occupancyPercent = Math.round((peopleCount / busCapacity) * 100);
+  let crowdLevel = 'LOW';
+  let color = '#4CAF50'; // Green
+  
+  if (peopleCount >= busCapacity) {
+    crowdLevel = 'FULL';
+    color = '#9C27B0'; // Purple
+  } else if (peopleCount > Math.floor(busCapacity * 0.75)) {
+    crowdLevel = 'HIGH';
+    color = '#F44336'; // Red
+  } else if (peopleCount > Math.floor(busCapacity * 0.375)) {
+    crowdLevel = 'MEDIUM';
+    color = '#FF9800'; // Orange
+  }
+  
+  return { crowdLevel, color, occupancyPercent };
+}
+
+async function fetchCrowdData(busId, apiUrl, busCapacity) {
+  try {
+    const res = await fetch(apiUrl, {
+      timeout: 5000,
+      headers: { 'Accept': 'application/json' }
+    });
+    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    const data = await res.json();
+    const peopleCount = parseInt(data.people_count) || 0;
+    const { crowdLevel, color, occupancyPercent } = normalizeCrowdLevel(peopleCount, busCapacity);
+    
+    crowdState[busId] = {
+      busId,
+      peopleCount,
+      crowdLevel,
+      color,
+      occupancyPercent,
+      lastUpdated: new Date().toISOString(),
+      apiStatus: 'online',
+      lastError: null
+    };
+  } catch (err) {
+    const errorMsg = err.message || 'Unknown error';
+    if (!crowdState[busId]) {
+      crowdState[busId] = {
+        busId,
+        peopleCount: 0,
+        crowdLevel: 'UNAVAILABLE',
+        color: '#CCCCCC',
+        occupancyPercent: 0,
+        lastUpdated: null,
+        apiStatus: 'offline',
+        lastError: errorMsg
+      };
+    } else {
+      crowdState[busId].apiStatus = 'offline';
+      crowdState[busId].lastError = errorMsg;
+    }
+    console.error(`[Crowd] Failed to fetch for ${busId}: ${errorMsg}`);
+  }
+}
+
+function startCrowdPolling(busId, apiUrl, busCapacity, interval = 10000) {
+  // Clear existing polling if any
+  if (crowdPollingThreads[busId]) {
+    clearInterval(crowdPollingThreads[busId]);
+  }
+  
+  // Skip if no API URL
+  if (!apiUrl || apiUrl.trim() === '') {
+    crowdState[busId] = {
+      busId,
+      peopleCount: 0,
+      crowdLevel: 'UNAVAILABLE',
+      color: '#CCCCCC',
+      occupancyPercent: 0,
+      lastUpdated: null,
+      apiStatus: 'disabled',
+      lastError: 'No API URL configured'
+    };
+    return;
+  }
+  
+  // Initial fetch
+  fetchCrowdData(busId, apiUrl, busCapacity);
+  
+  // Start periodic polling
+  crowdPollingThreads[busId] = setInterval(() => {
+    fetchCrowdData(busId, apiUrl, busCapacity);
+  }, interval);
+  
+  console.log(`[Crowd] Started polling for ${busId} every ${interval}ms`);
+}
+
+function stopCrowdPolling(busId) {
+  if (crowdPollingThreads[busId]) {
+    clearInterval(crowdPollingThreads[busId]);
+    delete crowdPollingThreads[busId];
+    delete crowdState[busId];
+    console.log(`[Crowd] Stopped polling for ${busId}`);
+  }
+}
+
+function initializeCrowdService() {
+  try {
+    const db = readDb();
+    Object.values(db.colleges || {}).forEach(college => {
+      (college.buses || []).forEach(bus => {
+        if (bus.pollingEnabled && bus.crowdApiUrl?.trim()) {
+          const interval = (bus.pollingInterval || 10) * 1000;
+          startCrowdPolling(bus.id, bus.crowdApiUrl, bus.busCapacity || 40, interval);
+        } else {
+          // Mark as unavailable
+          crowdState[bus.id] = {
+            busId: bus.id,
+            peopleCount: 0,
+            crowdLevel: 'UNAVAILABLE',
+            color: '#CCCCCC',
+            occupancyPercent: 0,
+            lastUpdated: null,
+            apiStatus: bus.pollingEnabled ? 'offline' : 'disabled',
+            lastError: bus.crowdApiUrl ? 'Failed to fetch' : 'No API configured'
+          };
+        }
+      });
+    });
+    console.log('[Crowd] Service initialized');
+  } catch (e) {
+    console.error('[Crowd] Initialization failed:', e.message);
+  }
+}
+
+// ===== CROWD STATUS ENDPOINTS =====
+app.get('/api/crowd-status', (req, res) => {
+  const statuses = Object.values(crowdState).filter(s => s);
+  res.json({ crowdStatus: statuses });
+});
+
+app.get('/api/crowd-status/:busId', (req, res) => {
+  const busId = req.params.busId;
+  const status = crowdState[busId];
+  if (!status) return res.status(404).json({ error: 'bus not found' });
+  res.json(status);
+});
+
+// ===== UPDATE CROWD CONFIG (when admin saves bus settings) =====
+app.patch('/api/colleges/:code/buses/:busId/crowd-config', (req, res) => {
+  const { code, busId } = req.params;
+  const { crowdApiUrl, busCapacity, pollingEnabled, pollingInterval } = req.body;
+  
+  const db = readDb();
+  const college = db.colleges[code];
+  if (!college) return res.status(404).json({ error: 'college not found' });
+  
+  const bus = (college.buses || []).find(b => b.id === busId);
+  if (!bus) return res.status(404).json({ error: 'bus not found' });
+  
+  // Update bus config
+  bus.crowdApiUrl = crowdApiUrl || '';
+  bus.busCapacity = busCapacity || 40;
+  bus.pollingEnabled = pollingEnabled !== false;
+  bus.pollingInterval = pollingInterval || 10;
+  
+  writeDb(db);
+  
+  // Restart polling with new config
+  const interval = bus.pollingInterval * 1000;
+  if (bus.pollingEnabled && bus.crowdApiUrl?.trim()) {
+    startCrowdPolling(bus.id, bus.crowdApiUrl, bus.busCapacity, interval);
+  } else {
+    stopCrowdPolling(bus.id);
+  }
+  
+  res.json({ ok: true, bus });
+});
+
 // Optionally sync data.json from GitHub data repo on startup
 (async () => {
   try {
@@ -633,6 +814,9 @@ const PORT = process.env.PORT || 3000;
   } catch (e) {
     console.warn('Startup data sync failed:', e.message);
   } finally {
+    // Initialize crowd monitoring service
+    initializeCrowdService();
+    
     app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
   }
 })();
