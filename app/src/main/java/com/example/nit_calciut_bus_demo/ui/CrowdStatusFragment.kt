@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.nit_calciut_bus_demo.R
@@ -66,10 +67,7 @@ class CrowdStatusFragment : Fragment() {
             // Update color
             try {
                 val color = Color.parseColor(state.crowdColor ?: "#CCCCCC")
-                crowdProgressBar.progressDrawable.setColorFilter(
-                    color,
-                    android.graphics.PorterDuff.Mode.SRC_IN
-                )
+                DrawableCompat.setTint(crowdProgressBar.progressDrawable, color)
                 crowdLevelText.setTextColor(color)
             } catch (e: Exception) {
                 crowdLevelText.setTextColor(Color.GRAY)

@@ -23,8 +23,7 @@ import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+// chip controls removed
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -41,21 +40,14 @@ class BusStopsFragment : Fragment() {
     private var allStops: List<Stop> = emptyList()
     private var allRoutes: List<Route> = emptyList()
     private var allBuses: List<Bus> = emptyList()
-    private var selectedFilter: BusFilter = BusFilter.ALL
 
     private lateinit var stopNameText: TextView
     private lateinit var liveStatusText: TextView
     private lateinit var locationButton: MaterialButton
-    private lateinit var filterChips: ChipGroup
 
     companion object {}
 
-    private enum class BusFilter {
-        ALL,
-        NEARBY,
-        FAVORITES,
-        MY_ROUTES
-    }
+    // filter chips removed: Nearby / Favorites / My Routes
 
     private data class LiveBusPoint(
         val busId: String,
@@ -83,11 +75,8 @@ class BusStopsFragment : Fragment() {
         stopNameText = view.findViewById(R.id.stopNameText)
         liveStatusText = view.findViewById(R.id.liveStatusText)
         locationButton = view.findViewById(R.id.locationButton)
-        filterChips = view.findViewById(R.id.busFilterChips)
 
         locationButton.setOnClickListener { focusOnUserLocation() }
-
-        setupFilterChips()
 
         val fused = LocationServices.getFusedLocationProviderClient(requireContext())
         fused.lastLocation.addOnSuccessListener { loc ->
@@ -129,26 +118,7 @@ class BusStopsFragment : Fragment() {
         loadAndRenderStops()
     }
 
-    private fun setupFilterChips() {
-        val chips = listOf(
-            R.id.chipAllBuses,
-            R.id.chipNearby,
-            R.id.chipFavorites,
-            R.id.chipMyRoutes
-        )
-        chips.forEach { id ->
-            filterChips.findViewById<Chip>(id)?.setOnClickListener {
-                selectedFilter = when (id) {
-                    R.id.chipNearby -> BusFilter.NEARBY
-                    R.id.chipFavorites -> BusFilter.FAVORITES
-                    R.id.chipMyRoutes -> BusFilter.MY_ROUTES
-                    else -> BusFilter.ALL
-                }
-                renderLiveMarkers()
-            }
-        }
-        filterChips.check(R.id.chipAllBuses)
-    }
+    // filter chips removed
 
     private fun configureMapUi(map: GoogleMap, preview: Boolean) {
         map.uiSettings.apply {
@@ -420,21 +390,7 @@ class BusStopsFragment : Fragment() {
     }
 
     private fun filteredLivePoints(): List<LiveBusPoint> {
-        return when (selectedFilter) {
-            BusFilter.ALL -> liveBusPoints
-            BusFilter.NEARBY -> {
-                val loc = userLocation ?: return liveBusPoints
-                liveBusPoints.filter {
-                    distanceMeters(loc.latitude, loc.longitude, it.position.latitude, it.position.longitude) <= 1200f
-                }
-            }
-            BusFilter.FAVORITES -> liveBusPoints.sortedBy { it.busName }.take(max(1, liveBusPoints.size.coerceAtMost(4)))
-            BusFilter.MY_ROUTES -> {
-                val stop = currentStop() ?: return liveBusPoints
-                val routeIds = allRoutes.filter { it.stopIds.contains(stop.id) }.map { it.id }.toSet()
-                if (routeIds.isEmpty()) liveBusPoints else liveBusPoints.filter { it.routeId in routeIds }
-            }
-        }
+        return liveBusPoints
     }
 
     private fun clusterLivePoints(points: List<LiveBusPoint>, zoom: Float): List<BusCluster> {

@@ -127,44 +127,7 @@
             android:textColor="@color/bus_on_surface_variant"
             android:textSize="13sp" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/busFilterChips"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            app:chipSpacingHorizontal="8dp"
-            app:chipSpacingVertical="8dp"
-            app:singleSelection="true"
-            app:selectionRequired="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipAllBuses"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All Buses" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipNearby"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nearby" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipFavorites"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Favorites" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipMyRoutes"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="My Routes" />
-        </com.google.android.material.chip.ChipGroup>
+        <!-- Removed filter chips: Nearby / All Buses / Favorites / My Routes -->
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/liveMapCard"

@@ -75,7 +75,6 @@ class RoutesFragment : Fragment() {
         ensureLocationAndFetch()
 
         busSelector = view.findViewById(R.id.busSelector)
-        val directionSelector = view.findViewById<Spinner>(R.id.directionSelector)
         val routeTitle = view.findViewById<TextView>(R.id.routeTitle)
         val liveStatusText = view.findViewById<TextView>(R.id.liveStatusText)
         val rushIndicatorText = view.findViewById<TextView>(R.id.rushIndicatorText)
@@ -142,24 +141,13 @@ class RoutesFragment : Fragment() {
         val routingModeNote = view.findViewById<TextView>(R.id.routingModeNote)
         val stepsHeader = view.findViewById<TextView>(R.id.stepsHeader)
 
-        if (directionSelector.adapter == null) {
-            // We'll set adapter entries dynamically once route stops are available
-            val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_item, mutableListOf())
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            directionSelector.adapter = adapter
-        }
-
-        // Update direction labels when route data changes and notify VM on user change
-        directionSelector.onItemSelectedListener = object : android.widget.AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: android.widget.AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val currentlyReversed = viewModel.uiState.value?.directionReversed ?: false
-                val desiredReversed = position == 1
-                if (currentlyReversed != desiredReversed) {
-                    viewModel.setDirectionReversed(desiredReversed)
-                }
+        // Route selector listener
+        busSelector?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                viewModel.selectRoute(position)
             }
 
-            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
         recenterButton.setOnClickListener { focusOnUserLocation() }
@@ -185,7 +173,7 @@ class RoutesFragment : Fragment() {
                 liveStatusText.setTextColor(ContextCompat.getColor(requireContext(), R.color.bus_on_surface_variant))
                 liveDot.setBackgroundResource(R.drawable.circle_offline)
             }
-            // Populate bus selector when options ready
+            // Populate route selector when options ready
             if (busSelector?.adapter == null && state.busOptions.isNotEmpty()) {
                 val names = state.busOptions.map { it.second }
                 val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, names)
@@ -195,21 +183,6 @@ class RoutesFragment : Fragment() {
                 val defIndex = state.defaultBusIndex.coerceIn(0, names.size - 1)
                 busSelector?.setSelection(defIndex)
             }
-                // Update direction spinner labels to use actual stop names (start ⇄ end)
-                if (state.stopMarkers.isNotEmpty()) {
-                    val startName = state.stopMarkers.first().second
-                    val endName = state.stopMarkers.last().second
-                    val labels = listOf("$startName ⇄ $endName", "$endName ⇄ $startName")
-                    val dirAdapter = directionSelector.adapter as? ArrayAdapter<String>
-                    dirAdapter?.let { adp ->
-                        adp.clear()
-                        adp.addAll(labels)
-                        adp.notifyDataSetChanged()
-                        // set selection based on VM state
-                        val sel = if (state.directionReversed) 1 else 0
-                        if (directionSelector.selectedItemPosition != sel) directionSelector.setSelection(sel)
-                    }
-                }
             // Update routing mode selector without triggering listener loops
             selectedRoutingMode = state.routingMode
             val desiredCheckedId = if (state.routingMode == RoutingMode.GOOGLE) {
@@ -268,10 +241,7 @@ class RoutesFragment : Fragment() {
                 
                 try {
                     val color = android.graphics.Color.parseColor(state.crowdColor ?: "#CCCCCC")
-                    crowdProgressBar.progressDrawable.setColorFilter(
-                        color,
-                        android.graphics.PorterDuff.Mode.SRC_IN
-                    )
+                    androidx.core.graphics.drawable.DrawableCompat.setTint(crowdProgressBar.progressDrawable, color)
                     crowdLevelText.setTextColor(color)
                 } catch (e: Exception) {
                     crowdLevelText.setTextColor(android.graphics.Color.GRAY)
@@ -334,7 +304,7 @@ class RoutesFragment : Fragment() {
 
         busSelector?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                viewModel.selectBus(position)
+                viewModel.selectRoute(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit

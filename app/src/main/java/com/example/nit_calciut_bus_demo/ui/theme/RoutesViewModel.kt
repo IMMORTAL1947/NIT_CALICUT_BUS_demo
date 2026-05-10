@@ -64,12 +64,14 @@ class RoutesViewModel : ViewModel() {
     val routeError: LiveData<String?> = _routeError
 
     private var configJson: JSONObject? = null
-    private var selectedBusIndex: Int = 0
-    private var busOptions: List<Pair<String, String>> = emptyList()
+    private var selectedRouteIndex: Int = 0
+    private var routeOptions: List<Pair<String, String>> = emptyList() // routeId -> name
     private var routePoints: List<LatLng> = emptyList()
     private var stopOrder: List<String> = emptyList() // stop IDs in order
     private var stopById: Map<String, StopMeta> = emptyMap()
     private var routeName: String? = null
+    private var selectedBusId: String? = null  // bus serving selected route
+    private var selectedBusName: String? = null
     private var currentBusLatLng: LatLng? = null
     private var pollingThread: Thread? = null
     private var userLocation: Location? = null
@@ -85,7 +87,6 @@ class RoutesViewModel : ViewModel() {
     private var selectedStopIndex: Int? = null
     private var loading: Boolean = false
     private var error: String? = null
-    private var directionReversed: Boolean = false
     private var appContext: Context? = null
 
     fun setUserLocation(loc: Location?) {
@@ -124,25 +125,8 @@ class RoutesViewModel : ViewModel() {
         }.start()
     }
 
-    fun selectBus(index: Int) {
-        selectedBusIndex = index.coerceIn(0, busOptions.lastIndex)
-        // Recompute route points and stop states for selected bus
-        recomputeRouteForSelectedBus()
-        // Start crowd polling for this bus
-        val busId = busOptions.getOrNull(selectedBusIndex)?.first
-        if (!busId.isNullOrEmpty()) {
-            startCrowdPolling(busId)
-        }
-        publishUi()
-    }
-
-    fun setDirectionReversed(reversed: Boolean) {
-        if (directionReversed == reversed) return
-        directionReversed = reversed
-        // Recompute ordering based on new direction
-        recomputeRouteForSelectedBus()
-        publishUi()
-    }
+    // selectBus() and setDirectionReversed() have been replaced by selectRoute()
+    // Direction selection has been removed from the UI
 
     fun setRoutingMode(mode: RoutingMode) {
         routingMode = mode
@@ -176,82 +160,72 @@ class RoutesViewModel : ViewModel() {
         }
         stopById = stopsMap
 
-        // Build bus options
-        val busesArr = json.optJSONArray("buses") ?: JSONArray()
-        val options = mutableListOf<Pair<String, String>>()
-        val routeByBus = mutableMapOf<String, String>()
-        for (i in 0 until busesArr.length()) {
-            val b = busesArr.getJSONObject(i)
-            val id = b.getString("id")
-            val name = b.getString("name")
-            val routeId = b.optString("routeId", "")
-            options.add(Pair(id, name))
-            if (routeId.isNotEmpty()) routeByBus[id] = routeId
+        // Build route options
+        val routesArr = json.optJSONArray("routes") ?: JSONArray()
+        val routeOpts = mutableListOf<Pair<String, String>>()
+        for (i in 0 until routesArr.length()) {
+            val r = routesArr.getJSONObject(i)
+            val id = r.getString("id")
+            val name = r.getString("name")
+            routeOpts.add(Pair(id, name))
         }
-        busOptions = options
+        routeOptions = routeOpts
 
-        // Default bus selection: 0; could adjust via nearest later
-        selectedBusIndex = 0
+        // Default route selection: 0
+        selectedRouteIndex = 0
 
-        recomputeRouteForSelectedBus()
+        recomputeRouteForSelectedRoute()
         publishUi()
     }
 
-    private fun recomputeRouteForSelectedBus() {
+    private fun recomputeRouteForSelectedRoute() {
         val json = configJson ?: return
-        if (busOptions.isEmpty()) return
-        val (busId, busName) = busOptions[selectedBusIndex]
+        if (routeOptions.isEmpty()) return
+        val (routeId, routeName) = routeOptions[selectedRouteIndex]
+        this.routeName = routeName
 
-        // find route for this bus
+        // Find first bus serving this route
         val busesArr = json.optJSONArray("buses") ?: JSONArray()
-        var routeId: String? = null
+        var busId = ""
+        var busName = ""
         for (i in 0 until busesArr.length()) {
             val b = busesArr.getJSONObject(i)
-            if (b.getString("id") == busId) {
-                val rid = b.optString("routeId", "")
-                routeId = if (rid.isNotEmpty()) rid else null
+            if (b.optString("routeId", "").lowercase() == routeId.lowercase()) {
+                busId = b.getString("id")
+                busName = b.getString("name")
                 break
             }
         }
-        val routesArr = json.getJSONArray("routes")
+        
+        selectedBusId = busId
+        selectedBusName = busName
+
+        // Get the route details from routes array
+        val routesArr = json.optJSONArray("routes") ?: JSONArray()
         var chosenRoute: JSONObject? = null
-        // Only match routes where the ID explicitly matches the bus's routeId (case-insensitive)
-        if (routeId != null) {
-            for (i in 0 until routesArr.length()) {
-                val r = routesArr.getJSONObject(i)
-                if (r.getString("id").lowercase() == routeId.lowercase()) {
-                    chosenRoute = r
-                    break
-                }
+        for (i in 0 until routesArr.length()) {
+            val r = routesArr.getJSONObject(i)
+            if (r.getString("id").lowercase() == routeId.lowercase()) {
+                chosenRoute = r
+                break
             }
         }
-        // If no matching route found and routeId was null or unmatched, use first route as fallback
-        if (chosenRoute == null && routesArr.length() > 0) chosenRoute = routesArr.getJSONObject(0)
 
-        routeName = chosenRoute?.optString("name")
         val stopIds = chosenRoute?.getJSONArray("stopIds") ?: JSONArray()
         stopOrder = (0 until stopIds.length()).map { stopIds.getString(it) }
         routePoints = stopOrder.mapNotNull { id -> stopById[id]?.latLng }
 
-        if (directionReversed) {
-            stopOrder = stopOrder.reversed()
-            routePoints = routePoints.reversed()
-        }
-
         // Fetch schedules to get departure times for this bus+route combo
-        // For now, show only the first matching schedule's departure time on the first stop
-        val chosenRouteId = chosenRoute?.optString("id")
-        
         var departureTime: String? = null
-        if (!chosenRouteId.isNullOrEmpty() && !busId.isEmpty()) {
-          val schedulesArr = configJson?.optJSONArray("schedules") ?: JSONArray()
-          for (i in 0 until schedulesArr.length()) {
-            val sch = schedulesArr.getJSONObject(i)
-            if (sch.optString("routeId") == chosenRouteId && sch.optString("busId") == busId) {
-              departureTime = sch.optString("departureTime")
-              break // Use first matching schedule
+        if (busId.isNotEmpty()) {
+            val schedulesArr = json.optJSONArray("schedules") ?: JSONArray()
+            for (i in 0 until schedulesArr.length()) {
+                val sch = schedulesArr.getJSONObject(i)
+                if (sch.optString("routeId").lowercase() == routeId.lowercase() && sch.optString("busId") == busId) {
+                    departureTime = sch.optString("departureTime")
+                    break
+                }
             }
-          }
         }
 
         val states = stopOrder.mapIndexed { idx, id ->
@@ -259,27 +233,35 @@ class RoutesViewModel : ViewModel() {
             StopState(
                 index = idx,
                 name = meta?.name ?: id,
-                // Show departure time only on the first stop; other stops have no scheduled time in the new model
                 scheduledTime = if (idx == 0) departureTime else null,
                 status = StopStatus.UPCOMING,
                 showBusHere = false
             )
         }
         _stopStates.postValue(states)
+        
+        // Start crowd polling for the selected bus
+        if (busId.isNotEmpty()) {
+            startCrowdPolling(busId)
+        }
+    }
+
+    fun selectRoute(index: Int) {
+        selectedRouteIndex = index.coerceIn(0, routeOptions.lastIndex)
+        recomputeRouteForSelectedRoute()
         publishUi()
     }
 
     private fun publishUi() {
-        val (busId, busName) = busOptions.getOrNull(selectedBusIndex) ?: Pair("", "")
         _uiState.postValue(
             RouteUiState(
                 routeName = routeName,
-                busName = busName,
-                busOptions = busOptions,
-                defaultBusIndex = selectedBusIndex,
+                busName = selectedBusName,
+                busOptions = routeOptions,  // Now contains route options
+                defaultBusIndex = selectedRouteIndex,
                 routePoints = routePoints,
                 stopMarkers = routePoints.mapIndexed { i, latLng ->
-                    Pair(latLng, stopById[stopOrder[i]]?.name ?: stopOrder[i])
+                    Pair(latLng, stopById[stopOrder.getOrNull(i)]?.name ?: stopOrder.getOrNull(i) ?: "Stop")
                 },
                 busLatLng = currentBusLatLng,
                 routingMode = routingMode,
@@ -287,7 +269,7 @@ class RoutesViewModel : ViewModel() {
                 dijkstraSteps = dijkstraSteps,
                 loading = loading,
                 error = error,
-                directionReversed = directionReversed,
+                directionReversed = false,
                 crowdLevel = crowdLevel,
                 crowdColor = crowdColor,
                 crowdPercent = crowdPercent,
@@ -313,7 +295,7 @@ class RoutesViewModel : ViewModel() {
                         val response = conn.inputStream.bufferedReader().use { it.readText() }
                         val json = JSONObject(response)
                         val arr = json.getJSONArray("buses")
-                        val (targetBusId, _) = busOptions.getOrNull(selectedBusIndex) ?: Pair("", "")
+                        val (targetBusId, _) = routeOptions.getOrNull(selectedRouteIndex) ?: Pair("", "")
                         var latestTs = 0L
                         for (i in 0 until arr.length()) {
                             val o = arr.getJSONObject(i)
