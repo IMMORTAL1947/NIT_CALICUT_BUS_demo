@@ -5,12 +5,6 @@
       "name": "NIT CALICUT",
       "stops": [
         {
-          "id": "s1",
-          "name": "Stop 1",
-          "lat": 11.320166421905697,
-          "lng": 75.93175383556782
-        },
-        {
           "id": "s2",
           "name": "CENTER CIRCLE",
           "lat": 11.3215,
@@ -88,19 +82,6 @@
           "stopTimes": {}
         },
         {
-          "id": "newmbh",
-          "name": "NEWMBH",
-          "color": "#3734f4",
-          "stopIds": [
-            "s9",
-            "s2",
-            "s3",
-            "s4",
-            "s8"
-          ],
-          "stopTimes": {}
-        },
-        {
           "id": "eclhc_newmbh",
           "name": "ECLHC_NEWMBH",
           "color": "#3734f4",
@@ -155,38 +136,22 @@
         {
           "id": "newmbh",
           "name": "NEWMBH",
-          "routeId": "newmbh",
-          "crowdApiUrl": "",
-          "busCapacity": 40,
-          "pollingEnabled": true,
-          "pollingInterval": 10
+          "routeId": "newmbh"
         },
         {
           "id": "bus2",
           "name": "BUS2",
-          "routeId": "LH",
-          "crowdApiUrl": "",
-          "busCapacity": 40,
-          "pollingEnabled": true,
-          "pollingInterval": 10
+          "routeId": "LH"
         },
         {
           "id": "bus3",
           "name": "BUS3",
-          "routeId": "NEWMBH",
-          "crowdApiUrl": "",
-          "busCapacity": 40,
-          "pollingEnabled": true,
-          "pollingInterval": 10
+          "routeId": "NEWMBH"
         },
         {
           "id": "bus4",
           "name": "BUS4",
-          "routeId": "NEWMBH",
-          "crowdApiUrl": "",
-          "busCapacity": 40,
-          "pollingEnabled": true,
-          "pollingInterval": 10
+          "routeId": "NEWMBH"
         }
       ],
       "schedules": [
@@ -221,6 +186,409 @@
           "routeId": "newmbh",
           "busId": "bus1",
           "departureTime": "07:20",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "6zkdOJi2",
+          "routeId": "lh",
+          "busId": "bus4",
+          "departureTime": "07:55",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "n8nNyCg9",
+          "routeId": "eclhc_soms",
+          "busId": "bus4",
+          "departureTime": "07:20",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "bQc2usYg",
+          "routeId": "eclhc_soms",
+          "busId": "bus3",
+          "departureTime": "07:25",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "vgR776OE",
+          "routeId": "lh",
+          "busId": "bus3",
+          "departureTime": "08:15",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "F8aFEr9h",
+          "routeId": "eclhc_lh",
+          "busId": "bus4",
+          "departureTime": "07:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "IgRlNPTo",
+          "routeId": "eclhc_lh",
+          "busId": "bus3",
+          "departureTime": "08:05",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "1ZqM_KHS",
+          "routeId": "eclhc_soms",
+          "busId": "bus4",
+          "departureTime": "08:20",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "rVq0ELAp",
+          "routeId": "eclhc_soms",
+          "busId": "bus3",
+          "departureTime": "08:30",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "Gys7TkBV",
+          "routeId": "lh",
+          "busId": "bus4",
+          "departureTime": "08:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "Rbg4ecli",
+          "routeId": "lh",
+          "busId": "bus3",
+          "departureTime": "08:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "PBQ-B5ZH",
+          "routeId": "lh_arch",
+          "busId": "ac-bus",
+          "departureTime": "08:55",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "i7V3Sa1F",
+          "routeId": "newmbh",
+          "busId": "bus2",
+          "departureTime": "07:30",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "dhvyb_4l",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus1",
+          "departureTime": "07:30",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "EnOSblLN",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus2",
+          "departureTime": "07:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "ApJnF8_L",
+          "routeId": "newmbh",
+          "busId": "bus1",
+          "departureTime": "07:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "WVeDkfyK",
+          "routeId": "newmbh",
+          "busId": "bus2",
+          "departureTime": "07:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "MQ0C1jcq",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus1",
+          "departureTime": "07:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "y3VcTbQw",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus2",
+          "departureTime": "08:00",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "wJQhp8dW",
+          "routeId": "newmbh",
+          "busId": "bus1",
+          "departureTime": "08:00",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "DrcWxrvh",
+          "routeId": "newmbh",
+          "busId": "bus2",
+          "departureTime": "08:10",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "s8TvQNtQ",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus1",
+          "departureTime": "08:20",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "XtN7t0sL",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus2",
+          "departureTime": "08:30",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "FH3EaLPo",
+          "routeId": "newmbh",
+          "busId": "bus1",
+          "departureTime": "08:30",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "BbxEeOez",
+          "routeId": "newmbh",
+          "busId": "bus2",
+          "departureTime": "08:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "xU7yuxHP",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus1",
+          "departureTime": "08:40",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "Blslg98X",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus2",
+          "departureTime": "08:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "sOmW1s5d",
+          "routeId": "newmbh",
+          "busId": "bus1",
+          "departureTime": "08:50",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "xxxbi1Ap",
+          "routeId": "newmbh",
+          "busId": "ac-bus",
+          "departureTime": "08:55",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "QjTXR8_I",
+          "routeId": "newmbh",
+          "busId": "bus2",
+          "departureTime": "09:00",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "giXqEvVk",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus1",
+          "departureTime": "09:00",
+          "activeDays": [
+            "MON",
+            "TUE",
+            "WED",
+            "THU",
+            "FRI"
+          ]
+        },
+        {
+          "id": "GLH43DKb",
+          "routeId": "eclhc_newmbh",
+          "busId": "bus2",
+          "departureTime": "09:25",
           "activeDays": [
             "MON",
             "TUE",
